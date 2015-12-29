@@ -3,9 +3,11 @@ package com.jallier.kitchentimer;
 import android.os.Bundle;
 //import android.support.v4.app.Fragment;
 import android.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 
@@ -19,6 +21,9 @@ public class MainFragment extends Fragment {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "First timer";
     private TextView timer1;
+    private boolean timerRunning = false;
+
+    Button button;
 
     public MainFragment() {
         // Required empty public constructor
@@ -52,4 +57,15 @@ public class MainFragment extends Fragment {
         return inflater.inflate(R.layout.fragment_main, container, false);
     }
 
+    public void buttonPressed() {
+        View view = getView();
+        Button button = (Button)view.findViewById(R.id.button1);
+        if (!timerRunning) {
+            button.setText(R.string.buttonStop);
+            timerRunning = true;
+        } else {
+            button.setText(R.string.buttonStart);
+            timerRunning = false;
+        }
+    }
 }
