@@ -1,14 +1,13 @@
 package com.jallier.kitchentimer;
 
-import android.os.Bundle;
-//import android.support.v4.app.Fragment;
 import android.app.Fragment;
+import android.os.Bundle;
+import android.os.SystemClock;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.TextView;
+import android.widget.Chronometer;
 
 
 /**
@@ -20,10 +19,10 @@ public class MainFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "First timer";
-    private TextView timer1;
-    private boolean timerRunning = false;
 
-    Button button;
+    private Chronometer chrono;
+    private TimerState timerState;
+    private long timeWhenPaused;
 
     public MainFragment() {
         // Required empty public constructor
@@ -57,15 +56,43 @@ public class MainFragment extends Fragment {
         return inflater.inflate(R.layout.fragment_main, container, false);
     }
 
-    public void buttonPressed() {
+    @Override
+    public void onResume() {
+        super.onResume();
         View view = getView();
-        Button button = (Button)view.findViewById(R.id.button1);
-        if (!timerRunning) {
-            button.setText(R.string.buttonStop);
-            timerRunning = true;
-        } else {
-            button.setText(R.string.buttonStart);
-            timerRunning = false;
+        chrono = (Chronometer) view.findViewById(R.id.chronometer1);
+        timerState = TimerState.STOPPED;
+        //This will need to change once multiple timers are introduced.
+    }
+
+    public void startOrPauseTimer() {
+        if (timerState == TimerState.STOPPED) { //Start the timer from stopped state
+            chrono.setBase(SystemClock.elapsedRealtime());
+            chrono.start();
+            timerState = TimerState.STARTED;
+            Log.d(getClass().getSimpleName(), "Timer started");
+        } else if (timerState == TimerState.STARTED) { //Pause the timer from started state
+            timeWhenPaused = chrono.getBase() - SystemClock.elapsedRealtime();
+            chrono.stop();
+            //chrono.setBase(SystemClock.elapsedRealtime());
+            timerState = TimerState.PAUSED;
+            Log.d(getClass().getSimpleName(), "Timer paused");
+        } else if (timerState == TimerState.PAUSED) { //Resume the timer from paused state
+            chrono.setBase(SystemClock.elapsedRealtime() + timeWhenPaused);
+            chrono.start();
+            timerState = TimerState.STARTED;
+            Log.d(getClass().getSimpleName(), "Timer started");
         }
+    }
+
+    public void resetTimer() {
+        chrono.stop();
+        chrono.setBase(SystemClock.elapsedRealtime());
+        timerState = TimerState.STOPPED;
+        Log.d(getClass().getSimpleName(), "Timer reset");
+    }
+
+    private enum TimerState {
+        STARTED, STOPPED, PAUSED
     }
 }

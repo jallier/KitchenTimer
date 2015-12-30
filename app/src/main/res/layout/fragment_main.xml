@@ -14,17 +14,20 @@
         android:layout_height="match_parent"
         android:gravity="center_horizontal">
 
-        <TextView
+        <Chronometer
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/defaultTime"
-            android:id="@+id/timer1" />
+            android:id="@+id/chronometer1"
+            android:layout_gravity="center_horizontal"
+            android:textSize="50sp"
+            android:onClick="startTimer" />
 
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/buttonStart"
-            android:id="@+id/button1"
-            android:onClick="startTimer"/>
+            android:text="@string/reset"
+            android:id="@+id/btnReset"
+            android:onClick="resetTimer"/>
+
     </LinearLayout>
 </RelativeLayout>
