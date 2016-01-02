@@ -20,9 +20,7 @@ public class MainFragment extends Fragment {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "First timer";
 
-    private Chronometer chrono;
-    private TimerState timerState;
-    private long timeWhenPaused;
+    private Chrono[] chronos;
 
     public MainFragment() {
         // Required empty public constructor
@@ -32,7 +30,7 @@ public class MainFragment extends Fragment {
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
-     * @param param1 Parameter 1.
+     * @param time1 Parameter 1.
      * @return A new instance of fragment MainFragment.
      */
     // TODO: Rename and change types and number of parameters
@@ -60,39 +58,62 @@ public class MainFragment extends Fragment {
     public void onResume() {
         super.onResume();
         View view = getView();
-        chrono = (Chronometer) view.findViewById(R.id.chronometer1);
-        timerState = TimerState.STOPPED;
+        chronos = getChronos(view);
         //This will need to change once multiple timers are introduced.
     }
 
-    public void startOrPauseTimer() {
-        if (timerState == TimerState.STOPPED) { //Start the timer from stopped state
-            chrono.setBase(SystemClock.elapsedRealtime());
-            chrono.start();
-            timerState = TimerState.STARTED;
-            Log.d(getClass().getSimpleName(), "Timer started");
-        } else if (timerState == TimerState.STARTED) { //Pause the timer from started state
-            timeWhenPaused = chrono.getBase() - SystemClock.elapsedRealtime();
-            chrono.stop();
-            //chrono.setBase(SystemClock.elapsedRealtime());
-            timerState = TimerState.PAUSED;
-            Log.d(getClass().getSimpleName(), "Timer paused");
-        } else if (timerState == TimerState.PAUSED) { //Resume the timer from paused state
-            chrono.setBase(SystemClock.elapsedRealtime() + timeWhenPaused);
-            chrono.start();
-            timerState = TimerState.STARTED;
-            Log.d(getClass().getSimpleName(), "Timer started");
+    /**
+     * Trigger run method of the Chrono that was clicked
+     * @param v View of parent activity
+     */
+    public void startOrPauseTimer(View v) {
+        switch (v.getId()) {
+            case R.id.chrono0:
+                chronos[0].run();
+                break;
+            case R.id.chrono1:
+                chronos[1].run();
+                break;
+            case R.id.chrono2:
+                chronos[2].run();
+                break;
+            case R.id.chrono3:
+                chronos[3].run();
+                break;
         }
     }
 
-    public void resetTimer() {
-        chrono.stop();
-        chrono.setBase(SystemClock.elapsedRealtime());
-        timerState = TimerState.STOPPED;
-        Log.d(getClass().getSimpleName(), "Timer reset");
+    /**
+     * Reset the timer that was pressed
+     * @param v View of parent activity
+     */
+    public void resetTimer(View v) {
+        switch (v.getId()) {
+            case R.id.btnReset0:
+                chronos[0].reset();
+                break;
+            case R.id.btnReset1:
+                chronos[1].reset();
+                break;
+            case R.id.btnReset2:
+                chronos[2].reset();
+                break;
+            case R.id.btnReset3:
+                chronos[3].reset();
+                break;
+        }
     }
 
-    private enum TimerState {
-        STARTED, STOPPED, PAUSED
+    /** Get the ids of the Chronos in the main fragment
+     * @param v View of parent of Chronos in the main fragment
+     * @return Array of Chronometers in the fragment
+     */
+    protected Chrono[] getChronos(View v) {
+        return new Chrono[]{
+                (Chrono)v.findViewById(R.id.chrono0),
+                (Chrono)v.findViewById(R.id.chrono1),
+                (Chrono)v.findViewById(R.id.chrono2),
+                (Chrono)v.findViewById(R.id.chrono3)
+        };
     }
 }

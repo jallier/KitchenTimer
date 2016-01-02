@@ -19,10 +19,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void startTimer(View view) { //Triggered from tapping on time.
-        mainFragment.startOrPauseTimer();
+        mainFragment.startOrPauseTimer(view);
     }
 
     public void resetTimer(View view) { //Triggered from reset Button
-        mainFragment.resetTimer();
+        mainFragment.resetTimer(view);
     }
 }
