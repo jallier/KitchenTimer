@@ -8,7 +8,8 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.jallier.kitchentimer.MainActivity"
     android:orientation="vertical"
-    android:baselineAligned="false">
+    android:baselineAligned="false"
+    android:background="@color/colorPrimaryDark">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -18,10 +19,14 @@
         android:orientation="horizontal">
 
         <LinearLayout
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
+            android:layout_width="0dp"
+            android:layout_height="175dp"
             android:layout_weight="1"
             android:gravity="center_horizontal"
+            android:layout_marginLeft="@dimen/chrono_padding"
+            android:background="@drawable/simple_circle"
+            android:minHeight="150dp"
+            android:minWidth="150dp"
             android:orientation="vertical">
 
             <com.jallier.kitchentimer.Chrono
@@ -29,11 +34,15 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:onClick="startTimer"
-                android:textSize="50sp" />
+                android:layout_marginTop="25dp"
+                android:textSize="50sp"
+                android:textColor="@android:color/primary_text_dark"
+                android:focusableInTouchMode="false"
+                android:fontFamily="sans-serif-light" />
 
             <Button
                 android:id="@+id/btnReset0"
-                android:layout_width="fill_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:onClick="resetTimer"
                 android:text="@string/reset" />
@@ -41,11 +50,14 @@
         </LinearLayout>
 
         <LinearLayout
-            android:layout_height="fill_parent"
-            android:layout_width="fill_parent"
+            android:layout_width="0dp"
+            android:layout_height="175dp"
             android:layout_weight="1"
-            android:baselineAligned="false"
             android:gravity="center_horizontal"
+            android:layout_marginLeft="@dimen/chrono_padding"
+            android:background="@drawable/simple_circle"
+            android:minHeight="150dp"
+            android:minWidth="150dp"
             android:orientation="vertical">
 
             <com.jallier.kitchentimer.Chrono
@@ -53,11 +65,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:onClick="startTimer"
-                android:textSize="50sp" />
+                android:layout_marginTop="25dp"
+                android:textSize="50sp"
+                android:textColor="@android:color/primary_text_dark"
+                android:fontFamily="sans-serif-light" />
 
             <Button
                 android:id="@+id/btnReset1"
-                android:layout_width="fill_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:onClick="resetTimer"
                 android:text="@string/reset" />
@@ -74,9 +89,13 @@
 
         <LinearLayout
             android:layout_width="0dp"
-            android:layout_height="fill_parent"
+            android:layout_height="175dp"
             android:layout_weight="1"
             android:gravity="center_horizontal"
+            android:layout_marginLeft="@dimen/chrono_padding"
+            android:background="@drawable/simple_circle"
+            android:minHeight="175dp"
+            android:minWidth="150dp"
             android:orientation="vertical">
 
             <com.jallier.kitchentimer.Chrono
@@ -84,11 +103,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:onClick="startTimer"
-                android:textSize="50sp" />
+                android:layout_marginTop="25dp"
+                android:textSize="50sp"
+                android:textColor="@android:color/primary_text_dark"
+                android:fontFamily="sans-serif-light" />
 
             <Button
                 android:id="@+id/btnReset2"
-                android:layout_width="fill_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:onClick="resetTimer"
                 android:text="@string/reset" />
@@ -97,9 +119,13 @@
 
         <LinearLayout
             android:layout_width="0dp"
-            android:layout_height="fill_parent"
+            android:layout_height="175dp"
             android:layout_weight="1"
             android:gravity="center_horizontal"
+            android:layout_marginLeft="@dimen/chrono_padding"
+            android:background="@drawable/simple_circle"
+            android:minHeight="150dp"
+            android:minWidth="150dp"
             android:orientation="vertical">
 
             <com.jallier.kitchentimer.Chrono
@@ -107,11 +133,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:onClick="startTimer"
-                android:textSize="50sp" />
+                android:layout_marginTop="25dp"
+                android:textSize="50sp"
+                android:textColor="@android:color/primary_text_dark"
+                android:fontFamily="sans-serif-light" />
 
             <Button
                 android:id="@+id/btnReset3"
-                android:layout_width="fill_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:onClick="resetTimer"
                 android:text="@string/reset" />
