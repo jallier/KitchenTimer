@@ -2,6 +2,7 @@ package com.jallier.kitchentimer;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 
 public class MainActivity extends AppCompatActivity {
@@ -15,10 +16,13 @@ public class MainActivity extends AppCompatActivity {
         if (getFragmentManager().findFragmentById(android.R.id.content) == null) { //If fragment does not exist, create it.
             mainFragment = MainFragment.newInstance("Test");
             getFragmentManager().beginTransaction().add(android.R.id.content, mainFragment).commit();
+        } else {
+            mainFragment = (MainFragment)getFragmentManager().findFragmentById(android.R.id.content);
         }
+        //Log.d(getClass().getSimpleName(), "Activity created");
     }
 
-    public void startTimer(View view) { //Triggered from tapping on time.
+    public void startTimer(View view) { //Triggered from tapping on timer.
         mainFragment.startOrPauseTimer(view);
     }
 
