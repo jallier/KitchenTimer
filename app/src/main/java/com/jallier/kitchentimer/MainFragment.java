@@ -2,7 +2,6 @@ package com.jallier.kitchentimer;
 
 import android.app.Fragment;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -43,7 +42,7 @@ public class MainFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setRetainInstance(true);
+        //setRetainInstance(true);
         //Log.d(getClass().getSimpleName(), "Fragment created");
     }
 
@@ -58,6 +57,46 @@ public class MainFragment extends Fragment {
         super.onResume();
         View view = getView();
         chronos = getChronos(view);
+    }
+
+    /**
+     * Method called when the fragment is rebuilt and views are in place. Allows state to be restored from savedInstance
+     *
+     * @param savedInstanceState
+     */
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        chronos = getChronos(getView());
+        if (savedInstanceState != null) {
+            int i = 0;
+            for (Chrono chrono : chronos) {
+                String state = savedInstanceState.getString("Chrono " + i + " State");
+                long time = savedInstanceState.getLong("Chrono " + i + " Time");
+                chrono.setState(state);
+                chrono.setTimeWhenPaused(time);
+                chrono.resume();
+                i++;
+            }
+        }
+        //Log.d(getClass().getSimpleName(), "instance state restored");
+    }
+
+    /**
+     * Method that is called when device is rotated. Allows the state of the chronos to be saved to be restored when the fragment is rebuilt
+     * @param outState
+     */
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        int i = 0;
+        for (Chrono chrono : chronos) {
+            outState.putString("Chrono " + i + " State", chrono.getState().toString());
+            outState.putLong("Chrono " + i + " Time", chrono.getTimeWhenPaused());
+            //Log.d(getClass().getSimpleName(), "instance state saved");
+            //Log.d(getClass().getSimpleName(), "state is " + chrono.getState().toString());
+            i++;
+        }
+        super.onSaveInstanceState(outState);
     }
 
     /**
