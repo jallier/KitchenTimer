@@ -2,6 +2,7 @@ package com.jallier.kitchentimer;
 
 import android.app.Fragment;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -152,5 +153,12 @@ public class MainFragment extends Fragment {
                 (Chrono)v.findViewById(R.id.chrono2),
                 (Chrono)v.findViewById(R.id.chrono3)
         };
+    }
+
+    public void resetAll(View view) {
+        for (Chrono chrono : chronos) {
+            chrono.reset();
+        }
+        Log.d(getClass().getSimpleName(), "All chronos reset");
     }
 }

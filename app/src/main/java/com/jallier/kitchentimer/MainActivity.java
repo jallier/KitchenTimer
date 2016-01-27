@@ -47,4 +47,8 @@ public class MainActivity extends AppCompatActivity {
     public void resetTimer(View view) { //Triggered from reset Button
         mainFragment.resetTimer(view);
     }
+
+    public void resetAll(View view) { //Triggered from reset all button
+        mainFragment.resetAll(view);
+    }
 }
