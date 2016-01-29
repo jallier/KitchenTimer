@@ -16,6 +16,11 @@
             </intent-filter>
         </activity>
         <activity android:name=".Preferences" />
+
+        <service
+            android:name=".TimerService"
+            android:enabled="true"
+            android:exported="false"></service>
     </application>
 
 </manifest>

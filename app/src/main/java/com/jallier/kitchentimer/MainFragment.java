@@ -1,7 +1,12 @@
 package com.jallier.kitchentimer;
 
 import android.app.Fragment;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -105,6 +110,9 @@ public class MainFragment extends Fragment {
      * @param v View of parent activity
      */
     public void startOrPauseTimer(View v) {
+        Intent intent = new Intent(getActivity(), TimerService.class);
+        getActivity().startService(intent);
+        raiseNotif();
         switch (v.getId()) {
             case R.id.chrono0:
                 chronos[0].run();
@@ -160,5 +168,21 @@ public class MainFragment extends Fragment {
             chrono.reset();
         }
         Log.d(getClass().getSimpleName(), "All chronos reset");
+    }
+
+    private void raiseNotif() {
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(getActivity());
+        builder.setAutoCancel(true).setDefaults(Notification.DEFAULT_ALL);
+        builder.setContentTitle("Timers running")
+                .setSmallIcon(R.mipmap.ic_launcher);
+        builder.build();
+        NotificationCompat.InboxStyle inbox = new NotificationCompat.InboxStyle(builder);
+
+        NotificationManager mgr = (NotificationManager) getActivity().getSystemService(Context.NOTIFICATION_SERVICE);
+        mgr.notify(1234, inbox.addLine("woah")
+                .addLine("wafsdg")
+                .addLine("sdkljhsdfg")
+                .build());
+
     }
 }

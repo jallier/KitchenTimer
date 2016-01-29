@@ -7,4 +7,7 @@
     <string name="settings">Settings</string>
     <string name="speakElapsedSummary">Announce a timers elapsed time every five minutes using text-to-speech</string>
     <string name="speakElapsedTitle">Announce Elapsed Time</string>
+
+    <string name="notifTimersRunning">Timers Running</string>
+    <string name="notifTimersNumber">Timer</string>
 </resources>
