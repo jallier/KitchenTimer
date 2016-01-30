@@ -3,14 +3,17 @@ package com.jallier.kitchentimer;
 import android.app.Fragment;
 import android.app.Notification;
 import android.app.NotificationManager;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 
 /**
@@ -184,5 +187,23 @@ public class MainFragment extends Fragment {
                 .addLine("sdkljhsdfg")
                 .build());
 
+    }
+
+    public void startSVTimer(View view) {
+        final TextView timer = (TextView) getActivity().findViewById(R.id.svTimer);
+
+        getActivity().startService(new Intent(getActivity(), svTimerService.class));
+
+        BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                timer.setText(""+intent.getIntExtra("value", 0));
+            }
+        };
+        IntentFilter intentFilter = new IntentFilter("TEST");
+        getActivity().registerReceiver(broadcastReceiver, intentFilter);
+
+        //getActivity().unregisterReceiver(broadcastReceiver);
+        getActivity().stopService(new Intent(getActivity(), svTimerService.class));
     }
 }

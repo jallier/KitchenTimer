@@ -51,4 +51,8 @@ public class MainActivity extends AppCompatActivity {
     public void resetAll(View view) { //Triggered from reset all button
         mainFragment.resetAll(view);
     }
+
+    public void startSVTimer(View view) {
+        mainFragment.startSVTimer(view);
+    }
 }
