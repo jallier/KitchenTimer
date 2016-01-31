@@ -3,12 +3,12 @@ package com.jallier.kitchentimer;
 import android.os.SystemClock;
 import android.util.Log;
 
-public class Timer {
+public class Stopwatch {
     public enum TimerState {
         STOPPED, STARTED, PAUSED
     }
 
-    public Timer() {
+    public Stopwatch() {
         elapsedTime = 0;
     }
 
@@ -42,10 +42,32 @@ public class Timer {
     }
 
     public long getElapsedTime() {
-        if (state == TimerState.STOPPED) {
+        if (state == TimerState.STOPPED || state == TimerState.PAUSED) {
             return elapsedTime;
         } else { //calculate elapsed time, but do not set the variable
             return elapsedTime + (SystemClock.elapsedRealtime() - startTime);
         }
+    }
+
+    public String getStringElapsedTime() {
+        /**
+         * Hi future justin. Please finish this method. Just need to format the string correctly using string formatting
+         *  - should be in the tabs somewhere on the left <-----.
+         *  After that, you can add the tick to the service and see if it works :)
+         *  Have a great day
+         */
+        long elapsedTime = getElapsedTime();
+        int hour, minute, second;
+
+        hour = (int) (elapsedTime / 1000) / 3600;
+        minute = (int) ((elapsedTime / 1000) / 60) - (hour * 60);
+        second = (int) (elapsedTime / 1000) - (hour * 3600) - (minute * 60);
+
+        //return String.format((hour + ":" + minute + ":" + second), );
+        return String.format("%2d:%02d:%02d", hour, minute, second);
+    }
+
+    public TimerState getState() {
+        return state;
     }
 }

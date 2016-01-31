@@ -10,4 +10,6 @@
 
     <string name="notifTimersRunning">Timers Running</string>
     <string name="notifTimersNumber">Timer</string>
+
+    <string name="timerDefaultValue">0:00:00</string>
 </resources>
