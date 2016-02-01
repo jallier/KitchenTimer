@@ -17,13 +17,20 @@ import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
     private final String LOGTAG = getClass().getSimpleName();
-    private TextView timer;
+    private final String INTENT_FILTER_TIMERS = "com.jallier.kitchentimer" + "timers";
+    private final String INTENT_EXTRA_TIMER1 = "com.jallier.kitchentimer" + "timer1";
+    private final String INTENT_EXTRA_TIMER2 = "com.jallier.kitchentimer" + "timer2";
+    private final String INTENT_EXTRA_TIMER3 = "com.jallier.kitchentimer" + "timer3";
+    private final String INTENT_EXTRA_TIMER4 = "com.jallier.kitchentimer" + "timer4";
 
+    private TextView timer;
     private MainFragment mainFragment;
     private svTimerService myService;
+    private BroadcastReceiver timerReciever;
+    private Intent serviceIntent;
     private boolean isBound;
 
-    private ServiceConnection myConnection = new ServiceConnection() {
+    private ServiceConnection myConnection = new ServiceConnection() { //Create the binder for the service
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             svTimerService.MyBinder binder = (svTimerService.MyBinder) service;
@@ -49,31 +56,57 @@ public class MainActivity extends AppCompatActivity {
             mainFragment = (MainFragment)getFragmentManager().findFragmentById(android.R.id.content);
         }
 
-        Intent intent = new Intent(this, svTimerService.class);
-        bindService(intent, myConnection, Context.BIND_AUTO_CREATE);
-        Log.d(LOGTAG, "Service bound");
+        serviceIntent = new Intent(this, svTimerService.class);
+        startService(serviceIntent);
     }
 
     @Override
     protected void onDestroy() {
-        myService.unbindService(myConnection);
+        //myService.stateChanged();
+        //stopService(serviceIntent);
+        if (isFinishing()) {
+            stopService(serviceIntent);
+        }
         super.onDestroy();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        timer = (TextView) findViewById(R.id.svTimer);
+        //TODO set the intent string values as constants
+        timerReciever = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                Log.d(LOGTAG, "Broadcast recived - textview updated");
+                timer.setText(intent.getStringExtra(INTENT_EXTRA_TIMER1));
+            }
+        };
+        IntentFilter intentFilter = new IntentFilter(INTENT_FILTER_TIMERS);
+        registerReceiver(timerReciever, intentFilter);
+
+        bindService(serviceIntent, myConnection, Context.BIND_AUTO_CREATE);
+        Log.d(LOGTAG, "Service bound");
+    }
+
+    @Override
+    protected void onStop() {
+        unregisterReceiver(timerReciever);
+
+        unbindService(myConnection);
+        Log.d(LOGTAG, "Service unbound");
+        super.onStop();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        timer = (TextView) findViewById(R.id.svTimer);
-        //TODO Unregister this in onPause()
-        BroadcastReceiver timerReciever = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                Log.d(LOGTAG, "Broadcast recived");
-                timer.setText(intent.getStringExtra("value"));
-            }
-        };
-        IntentFilter intentFilter = new IntentFilter("timerIntent");
-        registerReceiver(timerReciever, intentFilter);
+        //myService.stateChanged();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
     }
 
     @Override
@@ -112,5 +145,9 @@ public class MainActivity extends AppCompatActivity {
         } else if (state == Stopwatch.TimerState.STARTED) {
             myService.pauseTimer();
         }
+    }
+
+    public void resetSvTimer(View view) {
+        myService.resetTimer();
     }
 }

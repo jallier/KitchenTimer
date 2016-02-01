@@ -87,7 +87,6 @@
         android:text="@string/resetAll"
         android:id="@+id/btnResetAll"
         android:layout_gravity="center"
-        android:layout_marginBottom="50dp"
         android:onClick="resetAll" />
 
     <TextView
@@ -97,7 +96,17 @@
         android:text="@string/timerDefaultValue"
         android:id="@+id/svTimer"
         android:textColor="@android:color/primary_text_dark"
-        android:onClick="startSVTimer" />
+        android:onClick="startSVTimer"
+        android:layout_gravity="center_horizontal" />
+
+    <Button
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/reset"
+        android:id="@+id/button"
+        android:layout_gravity="center"
+        android:onClick="resetSvTimer" />
 
     <LinearLayout
         android:layout_width="match_parent"

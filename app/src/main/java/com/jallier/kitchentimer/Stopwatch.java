@@ -50,12 +50,6 @@ public class Stopwatch {
     }
 
     public String getStringElapsedTime() {
-        /**
-         * Hi future justin. Please finish this method. Just need to format the string correctly using string formatting
-         *  - should be in the tabs somewhere on the left <-----.
-         *  After that, you can add the tick to the service and see if it works :)
-         *  Have a great day
-         */
         long elapsedTime = getElapsedTime();
         int hour, minute, second;
 
