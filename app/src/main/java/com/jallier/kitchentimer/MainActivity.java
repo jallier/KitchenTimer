@@ -17,11 +17,11 @@ import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
     private final String LOGTAG = getClass().getSimpleName();
-    private final String INTENT_FILTER_TIMERS = "com.jallier.kitchentimer" + "timers";
-    private final String INTENT_EXTRA_TIMER1 = "com.jallier.kitchentimer" + "timer1";
-    private final String INTENT_EXTRA_TIMER2 = "com.jallier.kitchentimer" + "timer2";
-    private final String INTENT_EXTRA_TIMER3 = "com.jallier.kitchentimer" + "timer3";
-    private final String INTENT_EXTRA_TIMER4 = "com.jallier.kitchentimer" + "timer4";
+    private final String INTENT_FILTER_TIMERS = "com.jallier.kitchentimer" + ".timers";
+    private final String INTENT_EXTRA_TIMER1 = "com.jallier.kitchentimer" + ".timer1";
+    private final String INTENT_EXTRA_TIMER2 = "com.jallier.kitchentimer" + ".timer2";
+    private final String INTENT_EXTRA_TIMER3 = "com.jallier.kitchentimer" + ".timer3";
+    private final String INTENT_EXTRA_TIMER4 = "com.jallier.kitchentimer" + ".timer4";
 
     private TextView timer;
     private MainFragment mainFragment;

@@ -11,11 +11,11 @@ import java.util.Random;
 
 public class svTimerService extends Service {
     private final String LOGTAG = getClass().getSimpleName();
-    private final String INTENT_FILTER_TIMERS = "com.jallier.kitchentimer" + "timers";
-    private final String INTENT_EXTRA_TIMER1 = "com.jallier.kitchentimer" + "timer1";
-    private final String INTENT_EXTRA_TIMER2 = "com.jallier.kitchentimer" + "timer2";
-    private final String INTENT_EXTRA_TIMER3 = "com.jallier.kitchentimer" + "timer3";
-    private final String INTENT_EXTRA_TIMER4 = "com.jallier.kitchentimer" + "timer4";
+    private final String INTENT_FILTER_TIMERS = "com.jallier.kitchentimer" + ".timers";
+    private final String INTENT_EXTRA_TIMER1 = "com.jallier.kitchentimer" + ".timer1";
+    private final String INTENT_EXTRA_TIMER2 = "com.jallier.kitchentimer" + ".timer2";
+    private final String INTENT_EXTRA_TIMER3 = "com.jallier.kitchentimer" + ".timer3";
+    private final String INTENT_EXTRA_TIMER4 = "com.jallier.kitchentimer" + ".timer4";
     private final IBinder myBinder = new MyBinder();
 
     private Stopwatch stopwatch;
