@@ -13,7 +13,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
@@ -28,7 +27,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView timer1;
     private MainFragment mainFragment;
     private svTimerService myService;
-    private BroadcastReceiver timerReciever;
+    private BroadcastReceiver timerReceiver;
     private Intent serviceIntent;
     private boolean isBound;
 
@@ -64,8 +63,6 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        //myService.stateChanged();
-        //stopService(serviceIntent);
         if (isFinishing()) {
             stopService(serviceIntent);
         }
@@ -78,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
         timer0 = (TextView) findViewById(R.id.svTimer0);
         timer1 = (TextView) findViewById(R.id.svTimer1);
         //TODO set the intent string values as constants
-        timerReciever = new BroadcastReceiver() {
+        timerReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
                 Log.d(LOGTAG, "Broadcast recived - textview updated");
@@ -87,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
             }
         };
         IntentFilter intentFilter = new IntentFilter(INTENT_FILTER_TIMERS);
-        registerReceiver(timerReciever, intentFilter);
+        registerReceiver(timerReceiver, intentFilter);
 
         bindService(serviceIntent, myConnection, Context.BIND_AUTO_CREATE);
         Log.d(LOGTAG, "Service bound");
@@ -95,7 +92,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onStop() {
-        unregisterReceiver(timerReciever);
+        unregisterReceiver(timerReceiver);
 
         unbindService(myConnection);
         Log.d(LOGTAG, "Service unbound");
@@ -105,7 +102,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        //myService.stateChanged();
     }
 
     @Override
@@ -124,24 +120,13 @@ public class MainActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.settings:
                 startActivity(new Intent(this, Preferences.class));
+                break;
         }
         return super.onOptionsItemSelected(item);
     }
 
-    public void startTimer(View view) { //Triggered from tapping on timer0.
-        mainFragment.startOrPauseTimer(view);
-    }
-
-    public void resetTimer(View view) { //Triggered from reset Button
-        mainFragment.resetTimer(view);
-    }
-
-    public void resetAll(View view) { //Triggered from reset all button
-        mainFragment.resetAll(view);
-    }
 
     public void svTimerStateChanged(View view) {
-        //TODO: Change this method and in the service so that the activity just tells the service the state has changed, and the service can figure out how to respond.
         int viewID = view.getId();
         myService.startTimer(viewID);
     }
