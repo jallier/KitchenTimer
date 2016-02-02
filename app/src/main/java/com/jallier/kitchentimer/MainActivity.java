@@ -13,17 +13,19 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
     private final String LOGTAG = getClass().getSimpleName();
     private final String INTENT_FILTER_TIMERS = "com.jallier.kitchentimer" + ".timers";
+    private final String INTENT_EXTRA_TIMER0 = "com.jallier.kitchentimer" + ".timer0";
     private final String INTENT_EXTRA_TIMER1 = "com.jallier.kitchentimer" + ".timer1";
     private final String INTENT_EXTRA_TIMER2 = "com.jallier.kitchentimer" + ".timer2";
     private final String INTENT_EXTRA_TIMER3 = "com.jallier.kitchentimer" + ".timer3";
-    private final String INTENT_EXTRA_TIMER4 = "com.jallier.kitchentimer" + ".timer4";
 
-    private TextView timer;
+    private TextView timer0;
+    private TextView timer1;
     private MainFragment mainFragment;
     private svTimerService myService;
     private BroadcastReceiver timerReciever;
@@ -73,13 +75,15 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        timer = (TextView) findViewById(R.id.svTimer);
+        timer0 = (TextView) findViewById(R.id.svTimer0);
+        timer1 = (TextView) findViewById(R.id.svTimer1);
         //TODO set the intent string values as constants
         timerReciever = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
                 Log.d(LOGTAG, "Broadcast recived - textview updated");
-                timer.setText(intent.getStringExtra(INTENT_EXTRA_TIMER1));
+                timer0.setText(intent.getStringExtra(INTENT_EXTRA_TIMER0));
+                timer1.setText(intent.getStringExtra(INTENT_EXTRA_TIMER1));
             }
         };
         IntentFilter intentFilter = new IntentFilter(INTENT_FILTER_TIMERS);
@@ -124,7 +128,7 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void startTimer(View view) { //Triggered from tapping on timer.
+    public void startTimer(View view) { //Triggered from tapping on timer0.
         mainFragment.startOrPauseTimer(view);
     }
 
@@ -136,18 +140,21 @@ public class MainActivity extends AppCompatActivity {
         mainFragment.resetAll(view);
     }
 
-    public void startSVTimer(View view) {
-        Stopwatch.TimerState state = myService.getTimerState();
-        if (state == Stopwatch.TimerState.STOPPED) {
-            myService.startTimer();
-        } else if (state == Stopwatch.TimerState.PAUSED) {
-            myService.restartTimer();
-        } else if (state == Stopwatch.TimerState.STARTED) {
-            myService.pauseTimer();
-        }
+    public void svTimerStateChanged(View view) {
+        //TODO: Change this method and in the service so that the activity just tells the service the state has changed, and the service can figure out how to respond.
+        int viewID = view.getId();
+        myService.startTimer(viewID);
     }
 
     public void resetSvTimer(View view) {
-        myService.resetTimer();
+        //This is a messy way to do this, but can't think of a better way rn
+        switch (view.getId()) {
+            case R.id.svBtnReset0:
+                myService.resetTimer(0);
+                break;
+            case R.id.svBtnReset1:
+                myService.resetTimer(1);
+                break;
+        }
     }
 }

@@ -4,10 +4,6 @@ import android.os.SystemClock;
 import android.util.Log;
 
 public class Stopwatch {
-    public enum TimerState {
-        STOPPED, STARTED, PAUSED
-    }
-
     public Stopwatch() {
         elapsedTime = 0;
     }

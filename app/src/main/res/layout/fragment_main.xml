@@ -80,33 +80,68 @@
         </LinearLayout>
     </LinearLayout>
 
-    <Button
-        style="?android:attr/buttonStyleSmall"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/resetAll"
-        android:id="@+id/btnResetAll"
-        android:layout_gravity="center"
-        android:onClick="resetAll" />
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="@string/timerDefaultValue"
-        android:id="@+id/svTimer"
-        android:textColor="@android:color/primary_text_dark"
-        android:onClick="startSVTimer"
-        android:layout_gravity="center_horizontal" />
+        <Button
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/resetAll"
+            android:id="@+id/btnResetAll"
+            android:layout_gravity="center"
+            android:onClick="resetAll"
+            android:layout_alignParentStart="false"
+            android:layout_centerHorizontal="true" />
 
-    <Button
-        style="?android:attr/buttonStyleSmall"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/reset"
-        android:id="@+id/button"
-        android:layout_gravity="center"
-        android:onClick="resetSvTimer" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="@string/timerDefaultValue"
+            android:id="@+id/svTimer0"
+            android:textColor="@android:color/primary_text_dark"
+            android:onClick="svTimerStateChanged"
+            android:layout_gravity="center_horizontal"
+            android:layout_below="@+id/btnResetAll"
+            android:layout_alignParentTop="false"
+            android:layout_centerHorizontal="true" />
+
+        <Button
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/reset"
+            android:id="@+id/svBtnReset0"
+            android:layout_gravity="center"
+            android:onClick="resetSvTimer"
+            android:layout_below="@+id/svTimer0"
+            android:layout_centerHorizontal="true" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="@string/timerDefaultValue"
+            android:id="@+id/svTimer1"
+            android:textColor="@android:color/primary_text_dark"
+            android:onClick="svTimerStateChanged"
+            android:layout_gravity="center_horizontal"
+            android:layout_above="@+id/svBtnReset0"
+            android:layout_toEndOf="@+id/btnResetAll" />
+
+        <Button
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/reset"
+            android:id="@+id/svBtnReset1"
+            android:layout_gravity="center"
+            android:onClick="resetSvTimer"
+            android:layout_below="@+id/svTimer1"
+            android:layout_alignStart="@+id/svTimer1" />
+    </RelativeLayout>
 
     <LinearLayout
         android:layout_width="match_parent"

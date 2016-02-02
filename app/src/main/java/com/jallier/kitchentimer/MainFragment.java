@@ -188,22 +188,4 @@ public class MainFragment extends Fragment {
                 .build());
 
     }
-
-    public void startSVTimer(View view) {
-        final TextView timer = (TextView) getActivity().findViewById(R.id.svTimer);
-
-        getActivity().startService(new Intent(getActivity(), svTimerService.class));
-
-        BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                timer.setText(""+intent.getIntExtra("value", 0));
-            }
-        };
-        IntentFilter intentFilter = new IntentFilter("TEST");
-        getActivity().registerReceiver(broadcastReceiver, intentFilter);
-
-        //getActivity().unregisterReceiver(broadcastReceiver);
-        getActivity().stopService(new Intent(getActivity(), svTimerService.class));
-    }
 }

@@ -12,14 +12,15 @@ import java.util.Random;
 public class svTimerService extends Service {
     private final String LOGTAG = getClass().getSimpleName();
     private final String INTENT_FILTER_TIMERS = "com.jallier.kitchentimer" + ".timers";
+    private final String INTENT_EXTRA_TIMER0 = "com.jallier.kitchentimer" + ".timer0";
     private final String INTENT_EXTRA_TIMER1 = "com.jallier.kitchentimer" + ".timer1";
     private final String INTENT_EXTRA_TIMER2 = "com.jallier.kitchentimer" + ".timer2";
     private final String INTENT_EXTRA_TIMER3 = "com.jallier.kitchentimer" + ".timer3";
-    private final String INTENT_EXTRA_TIMER4 = "com.jallier.kitchentimer" + ".timer4";
     private final IBinder myBinder = new MyBinder();
 
-    private Stopwatch stopwatch;
+    private Stopwatch[] stopwatches;
     private Handler h;
+    private boolean handlerRunning = false;
 
     public svTimerService() {
     }
@@ -41,7 +42,10 @@ public class svTimerService extends Service {
     public void onCreate() {
         super.onCreate();
         Log.d(LOGTAG, "Service created");
-        stopwatch = new Stopwatch();
+        stopwatches = new Stopwatch[]{
+                new Stopwatch(),
+                new Stopwatch()
+        };
     }
 
     @Override
@@ -53,37 +57,54 @@ public class svTimerService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        updateTimer();
+        updateTimers();
         return super.onStartCommand(intent, flags, startId);
     }
 
-    private void sendBroadcast(String timerValue) {
+    private void sendBroadcast(String[] timerValues) {
         Intent intent = new Intent(INTENT_FILTER_TIMERS);
-        intent.putExtra(INTENT_EXTRA_TIMER1, timerValue);
+        intent.putExtra(INTENT_EXTRA_TIMER0, timerValues[0]);
+        intent.putExtra(INTENT_EXTRA_TIMER1, timerValues[1]);
         sendBroadcast(intent);
     }
 
-    public Stopwatch.TimerState getTimerState() {
-        return stopwatch.getState();
+    public TimerState[] getTimerStates() {
+        TimerState[] states = new TimerState[4];
+        int i = 0;
+        for (Stopwatch stopwatch : stopwatches) {
+            states[i] = stopwatch.getState();
+            i++;
+        }
+        return states;
     }
 
-    public void startTimer() {
-        Log.d(LOGTAG, "Service started");
-        stopwatch.run();
-
-        startHandler();
+    public void startTimer(int viewID) {
+        switch (viewID) {
+            case R.id.svTimer0:
+                stopwatches[0].run();
+                break;
+            case R.id.svTimer1:
+                stopwatches[1].run();
+                break;
+        }
+        if (!handlerRunning) {
+            startHandler();
+        }
     }
 
     private void startHandler() {
         //Handler fires off a broadcast intent every 1000ms, which is received in the activity and updates the textview
+        handlerRunning = true;
+        Log.d(LOGTAG, "Service started");
         h = new Handler();
-        final int delay = 1000; //milliseconds
+        final int delay = 500; //milliseconds
         Random random = new Random();
         final int id = random.nextInt(); //Used as id to confirm only one handler is running at a time
         h.postDelayed(new Runnable() {
             public void run() {
                 Log.d(LOGTAG, id + " Handler runs");
-                sendBroadcast(stopwatch.getStringElapsedTime());
+                //sendBroadcast(stopwatches.getStringElapsedTime());
+                updateTimers();
                 h.postDelayed(this, delay);
             }
         }, delay);
@@ -92,28 +113,68 @@ public class svTimerService extends Service {
     private void stopHandler() {
         if (h != null) {
             h.removeCallbacksAndMessages(null);
+            handlerRunning = false;
             Log.d(LOGTAG, "Handler destroyed");
         }
     }
 
-    public void restartTimer() {
-        stopwatch.run();
-        updateTimer();
+    public void restartTimer(int viewID) {
+        //TODO: Restructure timer code to use different methods for start/pause/reset
+        switch (viewID) {
+            case R.id.svTimer0:
+                stopwatches[0].run();
+                break;
+            case R.id.svTimer1:
+                stopwatches[1].run();
+                break;
+        }
+        updateTimers();
     }
 
-    public void pauseTimer() {
-        //Need to make this cleaner in the stopwatch code
-        stopwatch.run();
-        updateTimer();
+    public void pauseTimer(int viewID) {
+        //Need to make this cleaner in the stopwatches code
+        switch (viewID) {
+            case R.id.svTimer0:
+                stopwatches[0].run();
+                break;
+            case R.id.svTimer1:
+                stopwatches[1].run();
+                break;
+        }
+        updateTimers();
     }
 
-    public void resetTimer() {
-        stopwatch.reset();
-        stopHandler();
-        updateTimer();
+    public void resetTimer(int buttonID) {
+        //TODO: FIX THIS
+        switch (buttonID) {
+            case 0:
+                stopwatches[0].reset();
+                break;
+            case 1:
+                stopwatches[1].reset();
+                break;
+        }
+        //Check if any timers are running before stopping the handler
+        int numberOfTimersRunning = 0;
+        TimerState[] states = getTimerStates();
+        for (TimerState state : states) {
+            if (state == TimerState.STARTED || state == TimerState.PAUSED) {
+                numberOfTimersRunning++;
+            }
+        }
+        if (numberOfTimersRunning < 1) {
+            stopHandler();
+        }
+        updateTimers();
     }
 
-    public void updateTimer() {
-        sendBroadcast(stopwatch.getStringElapsedTime());
+    public void updateTimers() {
+        String[] elapsedTimeValues = new String[4];
+        int i = 0;
+        for (Stopwatch stopwatch : stopwatches) {
+            elapsedTimeValues[i] = stopwatch.getStringElapsedTime();
+            i++;
+        }
+        sendBroadcast(elapsedTimeValues);
     }
 }
