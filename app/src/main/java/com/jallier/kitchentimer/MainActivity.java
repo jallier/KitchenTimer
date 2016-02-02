@@ -25,6 +25,8 @@ public class MainActivity extends AppCompatActivity {
 
     private TextView timer0;
     private TextView timer1;
+    private TextView timer2;
+    private TextView timer3;
     private MainFragment mainFragment;
     private svTimerService myService;
     private BroadcastReceiver timerReceiver;
@@ -74,13 +76,17 @@ public class MainActivity extends AppCompatActivity {
         super.onStart();
         timer0 = (TextView) findViewById(R.id.svTimer0);
         timer1 = (TextView) findViewById(R.id.svTimer1);
-        //TODO set the intent string values as constants
+        timer2 = (TextView) findViewById(R.id.svTimer2);
+        timer3 = (TextView) findViewById(R.id.svTimer3);
+
         timerReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
                 Log.d(LOGTAG, "Broadcast recived - textview updated");
                 timer0.setText(intent.getStringExtra(INTENT_EXTRA_TIMER0));
                 timer1.setText(intent.getStringExtra(INTENT_EXTRA_TIMER1));
+                timer2.setText(intent.getStringExtra(INTENT_EXTRA_TIMER2));
+                timer3.setText(intent.getStringExtra(INTENT_EXTRA_TIMER3));
             }
         };
         IntentFilter intentFilter = new IntentFilter(INTENT_FILTER_TIMERS);
@@ -97,16 +103,6 @@ public class MainActivity extends AppCompatActivity {
         unbindService(myConnection);
         Log.d(LOGTAG, "Service unbound");
         super.onStop();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
     }
 
     @Override
@@ -139,6 +135,12 @@ public class MainActivity extends AppCompatActivity {
                 break;
             case R.id.svBtnReset1:
                 myService.resetTimer(1);
+                break;
+            case R.id.svBtnReset2:
+                myService.resetTimer(2);
+                break;
+            case R.id.svBtnReset3:
+                myService.resetTimer(3);
                 break;
         }
     }

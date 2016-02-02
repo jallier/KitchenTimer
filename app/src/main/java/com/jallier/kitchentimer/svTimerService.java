@@ -44,6 +44,8 @@ public class svTimerService extends Service {
         Log.d(LOGTAG, "Service created");
         stopwatches = new Stopwatch[]{
                 new Stopwatch(),
+                new Stopwatch(),
+                new Stopwatch(),
                 new Stopwatch()
         };
     }
@@ -65,6 +67,8 @@ public class svTimerService extends Service {
         Intent intent = new Intent(INTENT_FILTER_TIMERS);
         intent.putExtra(INTENT_EXTRA_TIMER0, timerValues[0]);
         intent.putExtra(INTENT_EXTRA_TIMER1, timerValues[1]);
+        intent.putExtra(INTENT_EXTRA_TIMER2, timerValues[2]);
+        intent.putExtra(INTENT_EXTRA_TIMER3, timerValues[3]);
         sendBroadcast(intent);
     }
 
@@ -85,6 +89,12 @@ public class svTimerService extends Service {
                 break;
             case R.id.svTimer1:
                 stopwatches[1].run();
+                break;
+            case R.id.svTimer2:
+                stopwatches[2].run();
+                break;
+            case R.id.svTimer3:
+                stopwatches[3].run();
                 break;
         }
         if (!handlerRunning) {
@@ -127,6 +137,12 @@ public class svTimerService extends Service {
             case R.id.svTimer1:
                 stopwatches[1].run();
                 break;
+            case R.id.svTimer2:
+                stopwatches[2].run();
+                break;
+            case R.id.svTimer3:
+                stopwatches[3].run();
+                break;
         }
         updateTimers();
     }
@@ -140,6 +156,12 @@ public class svTimerService extends Service {
             case R.id.svTimer1:
                 stopwatches[1].run();
                 break;
+            case R.id.svTimer2:
+                stopwatches[2].run();
+                break;
+            case R.id.svTimer3:
+                stopwatches[3].run();
+                break;
         }
         updateTimers();
     }
@@ -152,6 +174,12 @@ public class svTimerService extends Service {
                 break;
             case 1:
                 stopwatches[1].reset();
+                break;
+            case 2:
+                stopwatches[2].reset();
+                break;
+            case 3:
+                stopwatches[3].reset();
                 break;
         }
         //Check if any timers are running before stopping the handler
