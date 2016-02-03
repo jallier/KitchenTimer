@@ -46,20 +46,4 @@ public class MainFragment extends Fragment {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_main, container, false);
     }
-
-    private void raiseNotif() {
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(getActivity());
-        builder.setAutoCancel(true).setDefaults(Notification.DEFAULT_ALL);
-        builder.setContentTitle("Timers running")
-                .setSmallIcon(R.mipmap.ic_launcher);
-        builder.build();
-        NotificationCompat.InboxStyle inbox = new NotificationCompat.InboxStyle(builder);
-
-        NotificationManager mgr = (NotificationManager) getActivity().getSystemService(Context.NOTIFICATION_SERVICE);
-        mgr.notify(1234, inbox.addLine("woah")
-                .addLine("wafsdg")
-                .addLine("sdkljhsdfg")
-                .build());
-
-    }
 }

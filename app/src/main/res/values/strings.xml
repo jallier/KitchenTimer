@@ -14,5 +14,6 @@
     <!-- Notifications -->
     <string name="notifTimersRunning">Timers Running</string>
     <string name="notifTimersNumber">Timer</string>
+    <string name="notifXTimersRunning"> timers running</string>
 
 </resources>

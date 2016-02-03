@@ -1,5 +1,8 @@
 package com.jallier.kitchentimer;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -8,6 +11,7 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -22,6 +26,7 @@ public class MainActivity extends AppCompatActivity {
     private final String INTENT_EXTRA_TIMER1 = "com.jallier.kitchentimer" + ".timer1";
     private final String INTENT_EXTRA_TIMER2 = "com.jallier.kitchentimer" + ".timer2";
     private final String INTENT_EXTRA_TIMER3 = "com.jallier.kitchentimer" + ".timer3";
+    private final int NOTIFICATION_ID = 548236;
 
     private TextView timer0;
     private TextView timer1;
@@ -61,6 +66,8 @@ public class MainActivity extends AppCompatActivity {
 
         serviceIntent = new Intent(this, svTimerService.class);
         startService(serviceIntent);
+
+        raiseNotif();
     }
 
     @Override
@@ -143,5 +150,36 @@ public class MainActivity extends AppCompatActivity {
                 myService.resetTimer(3);
                 break;
         }
+    }
+
+    private void raiseNotif() {
+        NotificationManager mgr = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        NotificationCompat.Builder notif = new NotificationCompat.Builder(this);
+
+        //Regular small style notification
+        notif.setAutoCancel(true)
+                .setDefaults(Notification.DEFAULT_ALL)
+                .setContentTitle(getString(R.string.notifTimersRunning))
+                .setContentText("X " + getString(R.string.notifXTimersRunning))
+                .setContentIntent(buildPendingIntent())
+                .setSmallIcon(R.mipmap.ic_launcher)
+                //.setOngoing(true)
+                .setPriority(Notification.PRIORITY_DEFAULT);
+
+        //Expanded style notification
+        NotificationCompat.InboxStyle big = new NotificationCompat.InboxStyle(notif);
+        mgr.notify(NOTIFICATION_ID,
+                big.addLine(getString(R.string.notifTimersNumber) + " 1 - ")
+                        .addLine(getString(R.string.notifTimersNumber) + " 2 - ")
+                        .addLine(getString(R.string.notifTimersNumber) + " 3 - ")
+                        .addLine(getString(R.string.notifTimersNumber) + " 4 - ")
+                        .build());
+    }
+
+    private PendingIntent buildPendingIntent() {
+        Intent intent = new Intent(this, MainActivity.class);
+        intent.setAction(Intent.ACTION_MAIN);
+        intent.addCategory(Intent.CATEGORY_LAUNCHER);
+        return PendingIntent.getActivity(this, 0, intent, 0);
     }
 }
