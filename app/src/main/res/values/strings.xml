@@ -15,5 +15,6 @@
     <string name="notifTimersRunning">Timers Running</string>
     <string name="notifTimersNumber">Timer</string>
     <string name="notifXTimersRunning"> timers running</string>
+    <string name="notifAction">Open app</string>
 
 </resources>

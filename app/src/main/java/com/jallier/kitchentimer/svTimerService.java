@@ -1,10 +1,15 @@
 package com.jallier.kitchentimer;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
+import android.support.annotation.Nullable;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import java.util.Random;
@@ -16,6 +21,7 @@ public class svTimerService extends Service {
     private final String INTENT_EXTRA_TIMER1 = "com.jallier.kitchentimer" + ".timer1";
     private final String INTENT_EXTRA_TIMER2 = "com.jallier.kitchentimer" + ".timer2";
     private final String INTENT_EXTRA_TIMER3 = "com.jallier.kitchentimer" + ".timer3";
+    private final int NOTIFICATION_ID = 548236;
     private final IBinder myBinder = new MyBinder();
 
     private Stopwatch[] stopwatches;
@@ -60,10 +66,12 @@ public class svTimerService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         updateTimers();
+        startForeground(NOTIFICATION_ID, raiseNotif(true));
         return super.onStartCommand(intent, flags, startId);
     }
 
     private void sendBroadcast(String[] timerValues) {
+        //TODO: Check if broadcast intents are the best/most efficient way to do this vs event bus. I think the broadcast reciever is causing lag
         Intent intent = new Intent(INTENT_FILTER_TIMERS);
         intent.putExtra(INTENT_EXTRA_TIMER0, timerValues[0]);
         intent.putExtra(INTENT_EXTRA_TIMER1, timerValues[1]);
@@ -113,7 +121,6 @@ public class svTimerService extends Service {
         h.postDelayed(new Runnable() {
             public void run() {
                 Log.d(LOGTAG, id + " Handler runs");
-                //sendBroadcast(stopwatches.getStringElapsedTime());
                 updateTimers();
                 h.postDelayed(this, delay);
             }
@@ -148,7 +155,7 @@ public class svTimerService extends Service {
     }
 
     public void pauseTimer(int viewID) {
-        //Need to make this cleaner in the stopwatches code
+        //TODO: make this cleaner in the stopwatches code
         switch (viewID) {
             case R.id.svTimer0:
                 stopwatches[0].run();
@@ -167,7 +174,6 @@ public class svTimerService extends Service {
     }
 
     public void resetTimer(int buttonID) {
-        //TODO: FIX THIS
         switch (buttonID) {
             case 0:
                 stopwatches[0].reset();
@@ -204,5 +210,46 @@ public class svTimerService extends Service {
             i++;
         }
         sendBroadcast(elapsedTimeValues);
+        raiseNotif(false);
+    }
+
+    @Nullable
+    private Notification raiseNotif(boolean startInForeground) {
+        NotificationManager mgr = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        NotificationCompat.Builder notif = new NotificationCompat.Builder(this);
+
+        //Regular small style notification
+        notif.setAutoCancel(true)
+                .setDefaults(Notification.DEFAULT_ALL)
+                .setContentTitle(getString(R.string.notifTimersRunning))
+                .setContentText("X " + getString(R.string.notifXTimersRunning))
+                .setContentIntent(buildPendingIntent())
+                .addAction(R.mipmap.ic_launcher, getString(R.string.notifAction), buildPendingIntent())
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .setOngoing(true)
+                .setPriority(Notification.PRIORITY_DEFAULT);
+
+        //Expanded style notification
+        NotificationCompat.InboxStyle big = new NotificationCompat.InboxStyle(notif);
+        int i = 1;
+        for (Stopwatch stopwatch : stopwatches) { //Add timers to notification
+            big.addLine(getString(R.string.notifTimersNumber) + " " + i + " - " + stopwatch.getStringElapsedTime());
+            i++;
+        }
+        mgr.notify(NOTIFICATION_ID, big.build());
+
+        if (startInForeground) {
+            return notif.build();
+        } else {
+            return null;
+        }
+    }
+
+    private PendingIntent buildPendingIntent() {
+        Intent intent = new Intent(this, MainActivity.class);
+        //Not sure if these two setters are needed.
+        intent.setAction(Intent.ACTION_MAIN);
+        intent.addCategory(Intent.CATEGORY_LAUNCHER);
+        return PendingIntent.getActivity(this, 0, intent, 0);
     }
 }
