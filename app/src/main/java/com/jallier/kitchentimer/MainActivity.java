@@ -104,7 +104,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         unregisterReceiver(timerReceiver);
-
         unbindService(myConnection);
         Log.d(LOGTAG, "Service unbound");
         super.onStop();

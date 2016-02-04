@@ -27,15 +27,34 @@ public class svTimerService extends Service {
     private Stopwatch[] stopwatches;
     private Handler h;
     private boolean handlerRunning = false;
+    private boolean serviceBound = true;
 
     public svTimerService() {
     }
 
     @Override
     public IBinder onBind(Intent intent) {
-        //startHandler();
         Log.d(LOGTAG, "service binds");
         return myBinder;
+    }
+
+    @Override
+    public void onRebind(Intent intent) {
+        stopForeground(true);
+        serviceBound = true;
+        super.onRebind(intent);
+    }
+
+    @Override
+    public boolean onUnbind(Intent intent) {
+        if (numberOfTimersRunning() != 0) {
+            startForeground(NOTIFICATION_ID, raiseNotif(true));
+        }
+        serviceBound = false;
+
+        //Return true so that onRebind is called
+        super.onUnbind(intent);
+        return true;
     }
 
     public class MyBinder extends Binder {
@@ -59,6 +78,7 @@ public class svTimerService extends Service {
     @Override
     public void onDestroy() {
         stopHandler();
+        stopForeground(true);
         Log.d(getClass().getSimpleName(), "Service stopped");
         super.onDestroy();
     }
@@ -66,7 +86,6 @@ public class svTimerService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         updateTimers();
-        startForeground(NOTIFICATION_ID, raiseNotif(true));
         return super.onStartCommand(intent, flags, startId);
     }
 
@@ -189,17 +208,21 @@ public class svTimerService extends Service {
                 break;
         }
         //Check if any timers are running before stopping the handler
-        int numberOfTimersRunning = 0;
-        TimerState[] states = getTimerStates();
-        for (TimerState state : states) {
-            if (state == TimerState.STARTED || state == TimerState.PAUSED) {
-                numberOfTimersRunning++;
-            }
-        }
-        if (numberOfTimersRunning < 1) {
+        if (numberOfTimersRunning() < 1) {
             stopHandler();
         }
         updateTimers();
+    }
+
+    private int numberOfTimersRunning() {
+        int i = 0;
+        TimerState[] states = getTimerStates();
+        for (TimerState state : states) {
+            if (state == TimerState.STARTED || state == TimerState.PAUSED) {
+                i++;
+            }
+        }
+        return i;
     }
 
     public void updateTimers() {
@@ -210,7 +233,9 @@ public class svTimerService extends Service {
             i++;
         }
         sendBroadcast(elapsedTimeValues);
-        raiseNotif(false);
+        if (!serviceBound) {
+            raiseNotif(false);
+        }
     }
 
     @Nullable
@@ -222,9 +247,9 @@ public class svTimerService extends Service {
         notif.setAutoCancel(true)
                 .setDefaults(Notification.DEFAULT_ALL)
                 .setContentTitle(getString(R.string.notifTimersRunning))
-                .setContentText("X " + getString(R.string.notifXTimersRunning))
+                .setContentText(numberOfTimersRunning() + " " + getString(R.string.notifXTimersRunning))
                 .setContentIntent(buildPendingIntent())
-                .addAction(R.mipmap.ic_launcher, getString(R.string.notifAction), buildPendingIntent())
+                .addAction(0, getString(R.string.notifAction), buildPendingIntent()) //Set icon to 0 to remove it.
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .setOngoing(true)
                 .setPriority(Notification.PRIORITY_DEFAULT);
