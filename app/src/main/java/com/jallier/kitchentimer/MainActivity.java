@@ -19,6 +19,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+
 public class MainActivity extends AppCompatActivity {
     private final String LOGTAG = getClass().getSimpleName();
     private final String INTENT_FILTER_TIMERS = "com.jallier.kitchentimer" + ".timers";
@@ -84,18 +87,7 @@ public class MainActivity extends AppCompatActivity {
         timer2 = (TextView) findViewById(R.id.svTimer2);
         timer3 = (TextView) findViewById(R.id.svTimer3);
 
-        timerReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                Log.d(LOGTAG, "Broadcast recived - textview updated");
-                timer0.setText(intent.getStringExtra(INTENT_EXTRA_TIMER0));
-                timer1.setText(intent.getStringExtra(INTENT_EXTRA_TIMER1));
-                timer2.setText(intent.getStringExtra(INTENT_EXTRA_TIMER2));
-                timer3.setText(intent.getStringExtra(INTENT_EXTRA_TIMER3));
-            }
-        };
-        IntentFilter intentFilter = new IntentFilter(INTENT_FILTER_TIMERS);
-        registerReceiver(timerReceiver, intentFilter);
+        EventBus.getDefault().register(this);
 
         bindService(serviceIntent, myConnection, Context.BIND_AUTO_CREATE);
         Log.d(LOGTAG, "Service bound");
@@ -103,7 +95,8 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onStop() {
-        unregisterReceiver(timerReceiver);
+        EventBus.getDefault().unregister(this);
+//        unregisterReceiver(timerReceiver);
         unbindService(myConnection);
         Log.d(LOGTAG, "Service unbound");
         super.onStop();
@@ -147,5 +140,14 @@ public class MainActivity extends AppCompatActivity {
                 myService.resetTimer(3);
                 break;
         }
+    }
+
+    @Subscribe
+    public void onTimerTickEvent(TimerTickEvent event) {
+        Log.d(LOGTAG, "Timer Tick event received");
+        timer0.setText(event.getState(INTENT_EXTRA_TIMER0));
+        timer1.setText(event.getState(INTENT_EXTRA_TIMER1));
+        timer2.setText(event.getState(INTENT_EXTRA_TIMER2));
+        timer3.setText(event.getState(INTENT_EXTRA_TIMER3));
     }
 }

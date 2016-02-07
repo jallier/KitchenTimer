@@ -12,6 +12,8 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
+import org.greenrobot.eventbus.EventBus;
+
 import java.util.Random;
 
 public class svTimerService extends Service {
@@ -91,12 +93,13 @@ public class svTimerService extends Service {
 
     private void sendBroadcast(String[] timerValues) {
         //TODO: Check if broadcast intents are the best/most efficient way to do this vs event bus. I think the broadcast reciever is causing lag
-        Intent intent = new Intent(INTENT_FILTER_TIMERS);
-        intent.putExtra(INTENT_EXTRA_TIMER0, timerValues[0]);
-        intent.putExtra(INTENT_EXTRA_TIMER1, timerValues[1]);
-        intent.putExtra(INTENT_EXTRA_TIMER2, timerValues[2]);
-        intent.putExtra(INTENT_EXTRA_TIMER3, timerValues[3]);
-        sendBroadcast(intent);
+
+        TimerTickEvent event = new TimerTickEvent();
+        event.addState(INTENT_EXTRA_TIMER0, timerValues[0]);
+        event.addState(INTENT_EXTRA_TIMER1, timerValues[1]);
+        event.addState(INTENT_EXTRA_TIMER2, timerValues[2]);
+        event.addState(INTENT_EXTRA_TIMER3, timerValues[3]);
+        EventBus.getDefault().post(event);
     }
 
     public TimerState[] getTimerStates() {
