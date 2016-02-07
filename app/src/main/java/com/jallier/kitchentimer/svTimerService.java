@@ -28,6 +28,8 @@ public class svTimerService extends Service {
 
     private Stopwatch[] stopwatches;
     private Handler h;
+    private NotificationCompat.Builder notifBuilder;
+    private NotificationCompat.BigTextStyle big;
     private boolean handlerRunning = false;
     private boolean serviceBound = true;
 
@@ -75,6 +77,7 @@ public class svTimerService extends Service {
                 new Stopwatch(),
                 new Stopwatch()
         };
+        buildNotification();
     }
 
     @Override
@@ -241,33 +244,43 @@ public class svTimerService extends Service {
         }
     }
 
-    @Nullable
-    private Notification raiseNotif(boolean startInForeground) {
-        NotificationManager mgr = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-        NotificationCompat.Builder notif = new NotificationCompat.Builder(this);
+    private void buildNotification() {
+        notifBuilder = new NotificationCompat.Builder(this);
 
         //Regular small style notification
-        notif.setAutoCancel(true)
-                .setDefaults(Notification.DEFAULT_ALL)
+        notifBuilder.setAutoCancel(true)
                 .setContentTitle(getString(R.string.notifTimersRunning))
-                .setContentText(numberOfTimersRunning() + " " + getString(R.string.notifXTimersRunning))
                 .setContentIntent(buildPendingIntent())
                 .addAction(0, getString(R.string.notifAction), buildPendingIntent()) //Set icon to 0 to remove it.
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .setOngoing(true)
-                .setPriority(Notification.PRIORITY_DEFAULT);
+                .setPriority(Notification.PRIORITY_DEFAULT)
+                .setOnlyAlertOnce(true);
+
+        big = new NotificationCompat.BigTextStyle();
+    }
+
+    @Nullable
+    private Notification raiseNotif(boolean startInForeground) {
+        NotificationManager mgr = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+
+        //Regular small style notification
+        notifBuilder.setContentText(numberOfTimersRunning() + " " + getString(R.string.notifXTimersRunning));
 
         //Expanded style notification
-        NotificationCompat.InboxStyle big = new NotificationCompat.InboxStyle(notif);
         int i = 1;
+        String notifContent = "";
         for (Stopwatch stopwatch : stopwatches) { //Add timers to notification
-            big.addLine(getString(R.string.notifTimersNumber) + " " + i + " - " + stopwatch.getStringElapsedTime());
+            notifContent += getString(R.string.notifTimersNumber) + " " + i + " - " + stopwatch.getStringElapsedTime();
+            notifContent += "\n";
             i++;
         }
-        mgr.notify(NOTIFICATION_ID, big.build());
+        big.bigText(notifContent);
+        notifBuilder.setStyle(big);
+        mgr.notify(NOTIFICATION_ID, notifBuilder.build());
 
         if (startInForeground) {
-            return notif.build();
+            return notifBuilder.build();
         } else {
             return null;
         }
