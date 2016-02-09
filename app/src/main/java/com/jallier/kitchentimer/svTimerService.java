@@ -252,7 +252,7 @@ public class svTimerService extends Service {
                 .setContentTitle(getString(R.string.notifTimersRunning))
                 .setContentIntent(buildPendingIntent())
                 .addAction(0, getString(R.string.notifAction), buildPendingIntent()) //Set icon to 0 to remove it.
-                .setSmallIcon(R.mipmap.ic_launcher)
+                .setSmallIcon(R.drawable.ic_notification)
                 .setOngoing(true)
                 .setPriority(Notification.PRIORITY_DEFAULT)
                 .setOnlyAlertOnce(true);
