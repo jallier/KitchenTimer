@@ -6,7 +6,6 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.os.Binder;
-import android.os.Handler;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
@@ -15,6 +14,8 @@ import android.util.Log;
 import org.greenrobot.eventbus.EventBus;
 
 import java.util.Random;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 public class svTimerService extends Service {
     private final String LOGTAG = getClass().getSimpleName();
@@ -27,10 +28,10 @@ public class svTimerService extends Service {
     private final IBinder myBinder = new MyBinder();
 
     private Stopwatch[] stopwatches;
-    private Handler h;
+    private ScheduledThreadPoolExecutor executor;
     private NotificationCompat.Builder notifBuilder;
     private NotificationCompat.BigTextStyle big;
-    private boolean handlerRunning = false;
+    private boolean executorRunning = false;
     private boolean serviceBound = true;
 
     public svTimerService() {
@@ -82,7 +83,7 @@ public class svTimerService extends Service {
 
     @Override
     public void onDestroy() {
-        stopHandler();
+        stopExecutor();
         stopForeground(true);
         Log.d(getClass().getSimpleName(), "Service stopped");
         super.onDestroy();
@@ -94,9 +95,7 @@ public class svTimerService extends Service {
         return super.onStartCommand(intent, flags, startId);
     }
 
-    private void sendBroadcast(String[] timerValues) {
-        //TODO: Check if broadcast intents are the best/most efficient way to do this vs event bus. I think the broadcast reciever is causing lag
-
+    private void postEventToActivity(String[] timerValues) {
         TimerTickEvent event = new TimerTickEvent();
         event.addState(INTENT_EXTRA_TIMER0, timerValues[0]);
         event.addState(INTENT_EXTRA_TIMER1, timerValues[1]);
@@ -130,32 +129,33 @@ public class svTimerService extends Service {
                 stopwatches[3].run();
                 break;
         }
-        if (!handlerRunning) {
-            startHandler();
+        if (!executorRunning) {
+            startExecutor();
         }
     }
 
-    private void startHandler() {
-        //Handler fires off a broadcast intent every 1000ms, which is received in the activity and updates the textview
-        handlerRunning = true;
+    private void startExecutor() {
+        //Executor fires off a broadcast intent every 1000ms, which is received in the activity and updates the textview
+        executorRunning = true;
         Log.d(LOGTAG, "Service started");
-        h = new Handler();
         final int delay = 500; //milliseconds
         Random random = new Random();
         final int id = random.nextInt(); //Used as id to confirm only one handler is running at a time
-        h.postDelayed(new Runnable() {
+
+        executor = new ScheduledThreadPoolExecutor(1);
+        executor.scheduleAtFixedRate(new Runnable() {
+            @Override
             public void run() {
-                Log.d(LOGTAG, id + " Handler runs");
+                Log.d(LOGTAG, id + " executor runs");
                 updateTimers();
-                h.postDelayed(this, delay);
             }
-        }, delay);
+        }, 0, delay, TimeUnit.MILLISECONDS);
     }
 
-    private void stopHandler() {
-        if (h != null) {
-            h.removeCallbacksAndMessages(null);
-            handlerRunning = false;
+    private void stopExecutor() {
+        if (executor != null) {
+            executor.shutdown();
+            executorRunning = false;
             Log.d(LOGTAG, "Handler destroyed");
         }
     }
@@ -215,7 +215,7 @@ public class svTimerService extends Service {
         }
         //Check if any timers are running before stopping the handler
         if (numberOfTimersRunning() < 1) {
-            stopHandler();
+            stopExecutor();
         }
         updateTimers();
     }
@@ -238,7 +238,7 @@ public class svTimerService extends Service {
             elapsedTimeValues[i] = stopwatch.getStringElapsedTime();
             i++;
         }
-        sendBroadcast(elapsedTimeValues);
+        postEventToActivity(elapsedTimeValues);
         if (!serviceBound) {
             raiseNotif(false);
         }
