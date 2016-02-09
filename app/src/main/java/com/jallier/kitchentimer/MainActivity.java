@@ -1,6 +1,5 @@
 package com.jallier.kitchentimer;
 
-import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -33,7 +32,6 @@ public class MainActivity extends AppCompatActivity {
     private TextView timer3;
     private MainFragment mainFragment;
     private svTimerService myService;
-    private BroadcastReceiver timerReceiver;
     private Intent serviceIntent;
     private boolean isBound;
 
@@ -95,6 +93,26 @@ public class MainActivity extends AppCompatActivity {
         unbindService(myConnection);
         Log.d(LOGTAG, "Service unbound");
         super.onStop();
+    }
+
+    /**
+     * Override default behaviour so that the service is not killed if the back button is pressed when any timers are still running
+     */
+    @Override
+    public void onBackPressed() {
+        boolean allTimersStopped = true;
+        TimerState[] states = myService.getTimerStates();
+        for (TimerState state : states) {
+            if (state != TimerState.STOPPED) {
+                allTimersStopped = false;
+                break;
+            }
+        }
+        if (allTimersStopped) {
+            super.onBackPressed();
+        } else {
+            moveTaskToBack(true);
+        }
     }
 
     @Override
