@@ -53,7 +53,7 @@ public class svTimerService extends Service {
     @Override
     public boolean onUnbind(Intent intent) {
         if (numberOfTimersRunning() != 0) {
-            startForeground(NOTIFICATION_ID, raiseNotif(true));
+            startForeground(NOTIFICATION_ID, raiseNotification(true));
         }
         serviceBound = false;
 
@@ -240,7 +240,7 @@ public class svTimerService extends Service {
         }
         postEventToActivity(elapsedTimeValues);
         if (!serviceBound) {
-            raiseNotif(false);
+            raiseNotification(false);
         }
     }
 
@@ -261,7 +261,7 @@ public class svTimerService extends Service {
     }
 
     @Nullable
-    private Notification raiseNotif(boolean startInForeground) {
+    private Notification raiseNotification(boolean startInForeground) {
         NotificationManager mgr = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 
         //Regular small style notification
@@ -271,10 +271,13 @@ public class svTimerService extends Service {
         int i = 1;
         String notifContent = "";
         for (Stopwatch stopwatch : stopwatches) { //Add timers to notification
-            notifContent += getString(R.string.notifTimersNumber) + " " + i + " - " + stopwatch.getStringElapsedTime();
-            notifContent += "\n";
+            if (stopwatch.getState() != TimerState.STOPPED) {
+                notifContent += getString(R.string.notifTimersNumber) + " " + i + " - " + stopwatch.getStringElapsedTime();
+                notifContent += "\n";
+            }
             i++;
         }
+        notifContent = notifContent.trim(); //Remove last newline char
         big.bigText(notifContent);
         notifBuilder.setStyle(big);
         mgr.notify(NOTIFICATION_ID, notifBuilder.build());
