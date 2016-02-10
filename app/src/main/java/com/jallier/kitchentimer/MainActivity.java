@@ -19,17 +19,14 @@ import org.greenrobot.eventbus.ThreadMode;
 
 public class MainActivity extends AppCompatActivity {
     private final String LOGTAG = getClass().getSimpleName();
-    private final String INTENT_FILTER_TIMERS = "com.jallier.kitchentimer" + ".timers";
-    private final String INTENT_EXTRA_TIMER0 = "com.jallier.kitchentimer" + ".timer0";
-    private final String INTENT_EXTRA_TIMER1 = "com.jallier.kitchentimer" + ".timer1";
-    private final String INTENT_EXTRA_TIMER2 = "com.jallier.kitchentimer" + ".timer2";
-    private final String INTENT_EXTRA_TIMER3 = "com.jallier.kitchentimer" + ".timer3";
-    private final int NOTIFICATION_ID = 548236;
+    public final static String INTENT_EXTRA_TIMER0 = "com.jallier.kitchentimer" + ".timer0";
+    public final static String INTENT_EXTRA_TIMER1 = "com.jallier.kitchentimer" + ".timer1";
+    public final static String INTENT_EXTRA_TIMER2 = "com.jallier.kitchentimer" + ".timer2";
+    public final static String INTENT_EXTRA_TIMER3 = "com.jallier.kitchentimer" + ".timer3";
+    public final static String INTENT_EXTRA_TIMER4 = "com.jallier.kitchentimer" + ".timer4";
+    public final static int NOTIFICATION_ID = 548236;
 
-    private TextView timer0;
-    private TextView timer1;
-    private TextView timer2;
-    private TextView timer3;
+    private TextView timer0, timer1, timer2, timer3, timer4;
     private MainFragment mainFragment;
     private svTimerService myService;
     private Intent serviceIntent;
@@ -80,6 +77,7 @@ public class MainActivity extends AppCompatActivity {
         timer1 = (TextView) findViewById(R.id.svTimer1);
         timer2 = (TextView) findViewById(R.id.svTimer2);
         timer3 = (TextView) findViewById(R.id.svTimer3);
+        timer4 = (TextView) findViewById(R.id.svTimer4);
 
         EventBus.getDefault().register(this);
 
@@ -152,6 +150,9 @@ public class MainActivity extends AppCompatActivity {
             case R.id.svBtnReset3:
                 myService.resetTimer(3);
                 break;
+            case R.id.svBtnReset4:
+                myService.resetTimer(4);
+                break;
         }
     }
 
@@ -162,5 +163,6 @@ public class MainActivity extends AppCompatActivity {
         timer1.setText(event.getState(INTENT_EXTRA_TIMER1));
         timer2.setText(event.getState(INTENT_EXTRA_TIMER2));
         timer3.setText(event.getState(INTENT_EXTRA_TIMER3));
+        timer4.setText(event.getState(INTENT_EXTRA_TIMER4));
     }
 }

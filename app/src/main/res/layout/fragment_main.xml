@@ -11,15 +11,16 @@
     android:paddingBottom="@dimen/activity_vertical_margin"
     android:paddingRight="@dimen/activity_vertical_margin">
 
-    <RelativeLayout
+    <LinearLayout
+        android:orientation="vertical"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="false"
         android:background="@drawable/simple_circle"
-        android:minHeight="180dp"
-        android:minWidth="180dp"
+        android:minHeight="170dp"
+        android:minWidth="170dp"
         android:id="@+id/relativeLayout">
 
         <TextView
@@ -34,7 +35,6 @@
             android:fontFamily="sans-serif-light"
             android:textSize="45sp"
             android:layout_marginTop="50dp"
-            android:layout_centerHorizontal="true"
             android:paddingRight="10dp" />
 
         <Button
@@ -45,16 +45,16 @@
             android:id="@+id/svBtnReset0"
             android:layout_gravity="center"
             android:onClick="resetSvTimer"
-            android:layout_below="@+id/svTimer0"
-            android:layout_centerHorizontal="true" />
-    </RelativeLayout>
+            />
+    </LinearLayout>
 
-    <RelativeLayout
+    <LinearLayout
+        android:orientation="vertical"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@drawable/simple_circle"
-        android:minHeight="180dp"
-        android:minWidth="180dp"
+        android:minHeight="170dp"
+        android:minWidth="170dp"
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="false"
         android:layout_alignParentRight="true"
@@ -86,16 +86,19 @@
             android:layout_below="@+id/svTimer1"
             android:layout_centerHorizontal="true" />
 
-    </RelativeLayout>
+    </LinearLayout>
 
-    <RelativeLayout
+    <LinearLayout
+        android:orientation="vertical"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@drawable/simple_circle"
-        android:minHeight="180dp"
-        android:minWidth="180dp"
+        android:minHeight="170dp"
+        android:minWidth="170dp"
         android:layout_alignParentStart="true"
-        android:layout_below="@+id/relativeLayout">
+        android:layout_below="@+id/relativeLayout"
+        android:id="@+id/relativeLayout2"
+        android:layout_marginTop="15dp">
 
         <TextView
             android:layout_width="wrap_content"
@@ -122,17 +125,19 @@
             android:onClick="resetSvTimer"
             android:layout_below="@+id/svTimer2"
             android:layout_centerHorizontal="true" />
-    </RelativeLayout>
+    </LinearLayout>
 
-    <RelativeLayout
+    <LinearLayout
+        android:orientation="vertical"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@drawable/simple_circle"
-        android:minHeight="180dp"
-        android:minWidth="180dp"
+        android:minHeight="170dp"
+        android:minWidth="170dp"
         android:layout_alignParentStart="false"
         android:layout_below="@+id/relativeLayout"
-        android:layout_alignParentEnd="true">
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="15dp">
 
         <TextView
             android:layout_width="wrap_content"
@@ -159,7 +164,39 @@
             android:onClick="resetSvTimer"
             android:layout_below="@+id/svTimer3"
             android:layout_centerHorizontal="true" />
-    </RelativeLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/simple_rounded_square"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="@string/timerDefaultValue"
+            android:id="@+id/svTimer4"
+            android:textColor="@android:color/primary_text_dark"
+            android:onClick="svTimerStateChanged"
+            android:layout_gravity="center_horizontal"
+            android:fontFamily="sans-serif-light"
+            android:textSize="45sp"
+            android:layout_marginTop="10dp"/>
+
+        <Button
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/reset"
+            android:id="@+id/svBtnReset4"
+            android:layout_gravity="center"
+            android:onClick="resetSvTimer"
+            android:layout_marginBottom="10dp"/>
+    </LinearLayout>
 
 
 </RelativeLayout>

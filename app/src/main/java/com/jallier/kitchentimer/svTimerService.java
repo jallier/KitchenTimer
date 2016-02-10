@@ -19,12 +19,6 @@ import java.util.concurrent.TimeUnit;
 
 public class svTimerService extends Service {
     private final String LOGTAG = getClass().getSimpleName();
-    private final String INTENT_FILTER_TIMERS = "com.jallier.kitchentimer" + ".timers";
-    private final String INTENT_EXTRA_TIMER0 = "com.jallier.kitchentimer" + ".timer0";
-    private final String INTENT_EXTRA_TIMER1 = "com.jallier.kitchentimer" + ".timer1";
-    private final String INTENT_EXTRA_TIMER2 = "com.jallier.kitchentimer" + ".timer2";
-    private final String INTENT_EXTRA_TIMER3 = "com.jallier.kitchentimer" + ".timer3";
-    private final int NOTIFICATION_ID = 548236;
     private final IBinder myBinder = new MyBinder();
 
     private Stopwatch[] stopwatches;
@@ -53,7 +47,7 @@ public class svTimerService extends Service {
     @Override
     public boolean onUnbind(Intent intent) {
         if (numberOfTimersRunning() != 0) {
-            startForeground(NOTIFICATION_ID, raiseNotification(true));
+            startForeground(MainActivity.NOTIFICATION_ID, raiseNotification(true));
         }
         serviceBound = false;
 
@@ -73,6 +67,7 @@ public class svTimerService extends Service {
         super.onCreate();
         Log.d(LOGTAG, "Service created");
         stopwatches = new Stopwatch[]{
+                new Stopwatch(),
                 new Stopwatch(),
                 new Stopwatch(),
                 new Stopwatch(),
@@ -97,15 +92,16 @@ public class svTimerService extends Service {
 
     private void postEventToActivity(String[] timerValues) {
         TimerTickEvent event = new TimerTickEvent();
-        event.addState(INTENT_EXTRA_TIMER0, timerValues[0]);
-        event.addState(INTENT_EXTRA_TIMER1, timerValues[1]);
-        event.addState(INTENT_EXTRA_TIMER2, timerValues[2]);
-        event.addState(INTENT_EXTRA_TIMER3, timerValues[3]);
+        event.addState(MainActivity.INTENT_EXTRA_TIMER0, timerValues[0]);
+        event.addState(MainActivity.INTENT_EXTRA_TIMER1, timerValues[1]);
+        event.addState(MainActivity.INTENT_EXTRA_TIMER2, timerValues[2]);
+        event.addState(MainActivity.INTENT_EXTRA_TIMER3, timerValues[3]);
+        event.addState(MainActivity.INTENT_EXTRA_TIMER4, timerValues[4]);
         EventBus.getDefault().post(event);
     }
 
     public TimerState[] getTimerStates() {
-        TimerState[] states = new TimerState[4];
+        TimerState[] states = new TimerState[stopwatches.length];
         int i = 0;
         for (Stopwatch stopwatch : stopwatches) {
             states[i] = stopwatch.getState();
@@ -127,6 +123,9 @@ public class svTimerService extends Service {
                 break;
             case R.id.svTimer3:
                 stopwatches[3].run();
+                break;
+            case R.id.svTimer4:
+                stopwatches[4].run();
                 break;
         }
         if (!executorRunning) {
@@ -212,6 +211,9 @@ public class svTimerService extends Service {
             case 3:
                 stopwatches[3].reset();
                 break;
+            case 4:
+                stopwatches[4].reset();
+                break;
         }
         //Check if any timers are running before stopping the handler
         if (numberOfTimersRunning() < 1) {
@@ -232,7 +234,7 @@ public class svTimerService extends Service {
     }
 
     public void updateTimers() {
-        String[] elapsedTimeValues = new String[4];
+        String[] elapsedTimeValues = new String[stopwatches.length];
         int i = 0;
         for (Stopwatch stopwatch : stopwatches) {
             elapsedTimeValues[i] = stopwatch.getStringElapsedTime();
@@ -280,7 +282,7 @@ public class svTimerService extends Service {
         notifContent = notifContent.trim(); //Remove last newline char
         big.bigText(notifContent);
         notifBuilder.setStyle(big);
-        mgr.notify(NOTIFICATION_ID, notifBuilder.build());
+        mgr.notify(MainActivity.NOTIFICATION_ID, notifBuilder.build());
 
         if (startInForeground) {
             return notifBuilder.build();
