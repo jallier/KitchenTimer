@@ -41,11 +41,10 @@
             style="?android:attr/buttonStyleSmall"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/reset"
             android:id="@+id/svBtnReset0"
             android:layout_gravity="center"
             android:onClick="resetSvTimer"
-            />
+            android:background="@drawable/ic_reset_icon"/>
     </LinearLayout>
 
     <LinearLayout
@@ -79,12 +78,12 @@
             style="?android:attr/buttonStyleSmall"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/reset"
             android:id="@+id/svBtnReset1"
             android:layout_gravity="center"
             android:onClick="resetSvTimer"
             android:layout_below="@+id/svTimer1"
-            android:layout_centerHorizontal="true" />
+            android:layout_centerHorizontal="true"
+            android:background="@drawable/ic_reset_icon"/>
 
     </LinearLayout>
 
@@ -119,12 +118,12 @@
             style="?android:attr/buttonStyleSmall"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/reset"
             android:id="@+id/svBtnReset2"
             android:layout_gravity="center"
             android:onClick="resetSvTimer"
             android:layout_below="@+id/svTimer2"
-            android:layout_centerHorizontal="true" />
+            android:layout_centerHorizontal="true"
+            android:background="@drawable/ic_reset_icon"/>
     </LinearLayout>
 
     <LinearLayout
@@ -158,12 +157,12 @@
             style="?android:attr/buttonStyleSmall"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/reset"
             android:id="@+id/svBtnReset3"
             android:layout_gravity="center"
             android:onClick="resetSvTimer"
             android:layout_below="@+id/svTimer3"
-            android:layout_centerHorizontal="true" />
+            android:layout_centerHorizontal="true"
+            android:background="@drawable/ic_reset_icon"/>
     </LinearLayout>
 
     <LinearLayout
@@ -191,11 +190,11 @@
             style="?android:attr/buttonStyleSmall"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/reset"
             android:id="@+id/svBtnReset4"
             android:layout_gravity="center"
             android:onClick="resetSvTimer"
-            android:layout_marginBottom="10dp"/>
+            android:layout_marginBottom="10dp"
+            android:background="@drawable/ic_reset_icon"/>
     </LinearLayout>
 
 
