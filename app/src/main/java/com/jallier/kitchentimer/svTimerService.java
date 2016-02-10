@@ -34,6 +34,7 @@ public class svTimerService extends Service {
     @Override
     public IBinder onBind(Intent intent) {
         Log.d(LOGTAG, "service binds");
+        serviceBound = true;
         return myBinder;
     }
 
@@ -48,6 +49,7 @@ public class svTimerService extends Service {
     public boolean onUnbind(Intent intent) {
         if (numberOfTimersRunning() != 0) {
             startForeground(MainActivity.NOTIFICATION_ID, raiseNotification(true));
+            Log.d(LOGTAG, "Service started in foreground");
         }
         serviceBound = false;
 
@@ -86,6 +88,7 @@ public class svTimerService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        serviceBound = true;
         updateTimers();
         return super.onStartCommand(intent, flags, startId);
     }
