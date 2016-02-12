@@ -73,6 +73,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
+        //TODO Add checks to change size of textviews based on screen size
         timer0 = (TextView) findViewById(R.id.svTimer0);
         timer1 = (TextView) findViewById(R.id.svTimer1);
         timer2 = (TextView) findViewById(R.id.svTimer2);

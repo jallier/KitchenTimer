@@ -33,7 +33,6 @@ public class MainFragment extends Fragment {
      * @param time1 Parameter 1.
      * @return A new instance of fragment MainFragment.
      */
-    // TODO: Rename and change types and number of parameters
     public static MainFragment newInstance(String time1) {
         MainFragment fragment = new MainFragment();
         Bundle args = new Bundle();
