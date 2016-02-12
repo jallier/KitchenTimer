@@ -5,7 +5,7 @@ import android.util.AttributeSet;
 import android.widget.Button;
 
 /**
- * Created by Justin on 12/02/2016.
+ * Ensures that button is square by overriding onMeasure
  */
 public class SquareButton extends Button {
     public SquareButton(Context context) {

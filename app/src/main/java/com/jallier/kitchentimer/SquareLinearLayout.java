@@ -5,7 +5,7 @@ import android.util.AttributeSet;
 import android.widget.LinearLayout;
 
 /**
- * Created by Justin on 12/02/2016.
+ * Ensures that LinearLayout is square by overriding onMeasure
  */
 public class SquareLinearLayout extends LinearLayout {
     public SquareLinearLayout(Context context) {
