@@ -21,6 +21,8 @@
         android:background="@drawable/simple_circle"
         android:minHeight="130dp"
         android:minWidth="130dp"
+        android:layout_marginBottom="5dp"
+        android:layout_marginRight="5dp"
         android:orientation="vertical">
 
         <TextView
@@ -44,6 +46,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:background="@drawable/ic_reset_icon"
+            android:layout_marginBottom="2dp"
             android:onClick="resetSvTimer"/>
     </LinearLayout>
 
@@ -80,6 +83,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:background="@drawable/ic_reset_icon"
+            android:layout_marginBottom="2dp"
             android:onClick="resetSvTimer"/>
 
     </LinearLayout>
@@ -93,6 +97,7 @@
         android:background="@drawable/simple_circle"
         android:minHeight="130dp"
         android:minWidth="130dp"
+        android:layout_marginRight="5dp"
         android:orientation="vertical">
 
         <TextView
@@ -116,6 +121,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:background="@drawable/ic_reset_icon"
+            android:layout_marginBottom="2dp"
             android:onClick="resetSvTimer"/>
     </LinearLayout>
 
@@ -151,16 +157,18 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:background="@drawable/ic_reset_icon"
+            android:layout_marginBottom="2dp"
             android:onClick="resetSvTimer"/>
     </LinearLayout>
 
     <LinearLayout
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/linearLayout2"
-        android:layout_alignTop="@+id/linearLayout"
-        android:layout_toEndOf="@+id/linearLayout2"
         android:background="@drawable/simple_rounded_square"
+        android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="10dp"
+        android:layout_toEndOf="@+id/linearLayout"
         android:orientation="vertical">
 
         <TextView
@@ -168,12 +176,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:layout_marginTop="10dp"
             android:fontFamily="sans-serif-light"
             android:onClick="svTimerStateChanged"
             android:text="@string/timerDefaultValue"
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:textColor="@android:color/primary_text_dark"
+            android:layout_margin="10dp"
             android:textSize="45sp"/>
 
         <Button
