@@ -50,8 +50,10 @@ public class svTimerService extends Service {
         if (numberOfTimersRunning() != 0) {
             startForeground(MainActivity.NOTIFICATION_ID, raiseNotification(true));
             Log.d(LOGTAG, "Service started in foreground");
+            serviceBound = false;
+        } else { //Destroy the service
+            stopSelf();
         }
-        serviceBound = false;
 
         //Return true so that onRebind is called
         super.onUnbind(intent);
