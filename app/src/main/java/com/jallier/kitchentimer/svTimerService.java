@@ -14,6 +14,8 @@ import android.util.Log;
 import org.greenrobot.eventbus.EventBus;
 
 import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -22,6 +24,9 @@ public class svTimerService extends Service {
     private final IBinder myBinder = new MyBinder();
 
     private Stopwatch[] stopwatches;
+    private int[] stopwatchTTSTimeCounter;
+    private Timer ttsTimer;
+    private TTSTimerTask ttsTimerTask;
     private ScheduledThreadPoolExecutor executor;
     private NotificationCompat.Builder notifBuilder;
     private NotificationCompat.BigTextStyle big;
@@ -78,6 +83,9 @@ public class svTimerService extends Service {
                 new Stopwatch(),
                 new Stopwatch()
         };
+        stopwatchTTSTimeCounter = new int[]{5, 5, 5, 5, 5};
+        ttsTimer = new Timer();
+
         buildNotification();
         textToSpeechHelper = new TTSHelper(getApplicationContext());
     }
@@ -118,6 +126,50 @@ public class svTimerService extends Service {
         return states;
     }
 
+    private class TTSTimerTask extends TimerTask {
+        TTSHelper tts;
+        int timerID;
+
+        public TTSTimerTask(TTSHelper tts, int timerID) {
+            this.tts = tts;
+            this.timerID = timerID;
+        }
+
+        private String convertMinutesToHoursString(int minutes) {
+            String outputString = "";
+            int hours, minutesRemaining;
+            hours = (int) Math.floor(minutes / 60.0);
+            minutesRemaining = minutes % 60;
+            //Hours formatting
+            if (hours < 1) {
+                outputString += (minutesRemaining + " minutes elapsed");
+                return outputString;
+            } else if (hours == 1) {
+                outputString += (hours + " hour ");
+            } else {
+                outputString += (hours + " hours ");
+            }
+
+            //Minutes formatting
+            if (minutesRemaining != 0) {
+                outputString += (minutesRemaining + " minutes ");
+            }
+
+            outputString += "elapsed";
+
+            return outputString;
+        }
+
+
+        @Override
+        public void run() {
+            Log.d(LOGTAG, "TimerTask runs - ID " + timerID);
+            String output = "Timer " + (timerID + 1) + ". " + convertMinutesToHoursString(stopwatchTTSTimeCounter[timerID]);
+            stopwatchTTSTimeCounter[timerID] += 5;
+            tts.speak(output);
+        }
+    }
+
     public void startTimer(int viewID) {
         switch (viewID) {
             case R.id.svTimer0:
@@ -134,8 +186,10 @@ public class svTimerService extends Service {
                 break;
             case R.id.svTimer4:
                 stopwatches[4].run();
+                ttsTimerTask = new TTSTimerTask(textToSpeechHelper, 4);
                 break;
         }
+        ttsTimer.schedule(ttsTimerTask,5000, 5000);
         if (!executorRunning) {
             startExecutor();
         }
@@ -221,6 +275,7 @@ public class svTimerService extends Service {
                 break;
             case 4:
                 stopwatches[4].reset();
+                ttsTimerTask.cancel();
                 break;
         }
         //Check if any timers are running before stopping the handler
