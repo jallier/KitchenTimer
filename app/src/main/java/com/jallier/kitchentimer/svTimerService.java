@@ -25,8 +25,8 @@ public class svTimerService extends Service {
 
     private Stopwatch[] stopwatches;
     private int[] stopwatchTTSTimeCounter;
+    private TTSTimerTask[] ttsTimerTask;
     private Timer ttsTimer;
-    private TTSTimerTask ttsTimerTask;
     private ScheduledThreadPoolExecutor executor;
     private NotificationCompat.Builder notifBuilder;
     private NotificationCompat.BigTextStyle big;
@@ -84,6 +84,7 @@ public class svTimerService extends Service {
                 new Stopwatch()
         };
         stopwatchTTSTimeCounter = new int[]{5, 5, 5, 5, 5};
+        ttsTimerTask = new TTSTimerTask[5];
         ttsTimer = new Timer();
 
         buildNotification();
@@ -171,25 +172,35 @@ public class svTimerService extends Service {
     }
 
     public void startTimer(int viewID) {
+        int timerID = 0;
         switch (viewID) {
             case R.id.svTimer0:
+                timerID = 0;
                 stopwatches[0].run();
+                ttsTimerTask[0] = new TTSTimerTask(textToSpeechHelper, 0);
                 break;
             case R.id.svTimer1:
+                timerID = 1;
                 stopwatches[1].run();
+                ttsTimerTask[1] = new TTSTimerTask(textToSpeechHelper, 1);
                 break;
             case R.id.svTimer2:
+                timerID = 2;
                 stopwatches[2].run();
+                ttsTimerTask[2] = new TTSTimerTask(textToSpeechHelper, 2);
                 break;
             case R.id.svTimer3:
+                timerID = 3;
                 stopwatches[3].run();
+                ttsTimerTask[3] = new TTSTimerTask(textToSpeechHelper, 3);
                 break;
             case R.id.svTimer4:
+                timerID = 4;
                 stopwatches[4].run();
-                ttsTimerTask = new TTSTimerTask(textToSpeechHelper, 4);
+                ttsTimerTask[4] = new TTSTimerTask(textToSpeechHelper, 4);
                 break;
         }
-        ttsTimer.schedule(ttsTimerTask,5000, 5000);
+        ttsTimer.schedule(ttsTimerTask[timerID], 10000, 10000);
         if (!executorRunning) {
             startExecutor();
         }
@@ -263,19 +274,28 @@ public class svTimerService extends Service {
         switch (buttonID) {
             case 0:
                 stopwatches[0].reset();
+                ttsTimerTask[0].cancel();
+                stopwatchTTSTimeCounter[0] = 5;
                 break;
             case 1:
                 stopwatches[1].reset();
+                ttsTimerTask[1].cancel();
+                stopwatchTTSTimeCounter[1] = 5;
                 break;
             case 2:
                 stopwatches[2].reset();
+                ttsTimerTask[2].cancel();
+                stopwatchTTSTimeCounter[2] = 5;
                 break;
             case 3:
                 stopwatches[3].reset();
+                ttsTimerTask[3].cancel();
+                stopwatchTTSTimeCounter[3] = 5;
                 break;
             case 4:
                 stopwatches[4].reset();
-                ttsTimerTask.cancel();
+                ttsTimerTask[4].cancel();
+                stopwatchTTSTimeCounter[4] = 5;
                 break;
         }
         //Check if any timers are running before stopping the handler
