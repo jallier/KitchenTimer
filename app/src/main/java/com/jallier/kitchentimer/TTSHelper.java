@@ -21,7 +21,7 @@ public class TTSHelper implements TextToSpeech.OnInitListener {
     }
 
     public void speak(String words) {
-        Log.d(LOGTAG, "TTS uttering");
+        Log.d(LOGTAG, "TTS uttering: " + words);
         tts.speak(words, TextToSpeech.QUEUE_ADD, null, null);
     }
 

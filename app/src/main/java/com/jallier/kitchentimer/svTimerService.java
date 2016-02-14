@@ -4,7 +4,10 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Binder;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
@@ -19,15 +22,19 @@ import java.util.concurrent.TimeUnit;
 
 public class svTimerService extends Service {
     private final String LOGTAG = getClass().getSimpleName();
+    private final String INTENT_FILTER_ALARM = "com.jallier.kitchentimer" + ".alarmFilter";
+    private final String INTENT_EXTRA_TTS_TIMER_ID = "com.jallier.kitchentimer" + ".tts";
     private final IBinder myBinder = new MyBinder();
 
     private Stopwatch[] stopwatches;
+    private int[] stopwatchesTTSCounter; //Count elapsed minutes for TTS announcements
     private ScheduledThreadPoolExecutor executor;
     private NotificationCompat.Builder notifBuilder;
     private NotificationCompat.BigTextStyle big;
     private boolean executorRunning = false;
     private boolean serviceBound = true;
     private TTSHelper textToSpeechHelper;
+    private BroadcastReceiver alarmReceiver;
 
     public svTimerService() {
     }
@@ -78,8 +85,55 @@ public class svTimerService extends Service {
                 new Stopwatch(),
                 new Stopwatch()
         };
+        stopwatchesTTSCounter = new int[]{0, 0, 0, 0, 0};
         buildNotification();
         textToSpeechHelper = new TTSHelper(getApplicationContext());
+        alarmReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                Log.d(LOGTAG, "Alarm broadcast received");
+                handleReceivedAlarm(intent);
+            }
+        };
+        IntentFilter intentFilter = new IntentFilter(INTENT_FILTER_ALARM);
+        registerReceiver(alarmReceiver, intentFilter);
+    }
+
+    //TODO: Move this method somewhere else when done
+    private void handleReceivedAlarm(Intent intent) {
+        int timerID = intent.getIntExtra(INTENT_EXTRA_TTS_TIMER_ID, -1);
+        switch (timerID) { //Build tts string depending on which timer, and how many elapsed minutes
+            case -1:
+                //Do something here
+            case 4:
+                textToSpeechHelper.speak("Timer " + (timerID + 1) + ". " + convertMinutesToHoursString(stopwatchesTTSCounter[timerID]));
+                stopwatchesTTSCounter[timerID] += 5;
+        }
+    }
+
+    private String convertMinutesToHoursString(int minutes) {
+        String outputString = "";
+        int hours, minutesRemaining;
+        hours = (int) Math.floor(minutes / 60.0);
+        minutesRemaining = minutes % 60;
+        //Hours formatting
+        if (hours < 1) {
+            outputString += (minutesRemaining + " minutes elapsed");
+            return outputString;
+        } else if (hours == 1) {
+            outputString += (hours + " hour ");
+        } else {
+            outputString += (hours + " hours ");
+        }
+
+        //Minutes formatting
+        if (minutesRemaining != 0) {
+            outputString += (minutesRemaining + " minutes ");
+        }
+
+        outputString += "elapsed";
+
+        return outputString;
     }
 
     @Override
@@ -119,6 +173,7 @@ public class svTimerService extends Service {
     }
 
     public void startTimer(int viewID) {
+        Intent intent = new Intent(INTENT_FILTER_ALARM);
         switch (viewID) {
             case R.id.svTimer0:
                 stopwatches[0].run();
@@ -134,11 +189,14 @@ public class svTimerService extends Service {
                 break;
             case R.id.svTimer4:
                 stopwatches[4].run();
+                intent.putExtra(INTENT_EXTRA_TTS_TIMER_ID, 4);
                 break;
         }
         if (!executorRunning) {
             startExecutor();
         }
+        
+        sendBroadcast(intent);
     }
 
     private void startExecutor() {
