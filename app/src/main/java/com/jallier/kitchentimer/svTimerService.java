@@ -1,5 +1,6 @@
 package com.jallier.kitchentimer;
 
+import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -28,6 +29,7 @@ public class svTimerService extends Service {
 
     private Stopwatch[] stopwatches;
     private int[] stopwatchesTTSCounter; //Count elapsed minutes for TTS announcements
+    private PendingIntent[] alarmPendingIntents = new PendingIntent[5];
     private ScheduledThreadPoolExecutor executor;
     private NotificationCompat.Builder notifBuilder;
     private NotificationCompat.BigTextStyle big;
@@ -35,6 +37,7 @@ public class svTimerService extends Service {
     private boolean serviceBound = true;
     private TTSHelper textToSpeechHelper;
     private BroadcastReceiver alarmReceiver;
+    private AlarmManager alarmManager;
 
     public svTimerService() {
     }
@@ -78,6 +81,7 @@ public class svTimerService extends Service {
     public void onCreate() {
         super.onCreate();
         Log.d(LOGTAG, "Service created");
+        alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
         stopwatches = new Stopwatch[]{
                 new Stopwatch(),
                 new Stopwatch(),
@@ -85,7 +89,7 @@ public class svTimerService extends Service {
                 new Stopwatch(),
                 new Stopwatch()
         };
-        stopwatchesTTSCounter = new int[]{0, 0, 0, 0, 0};
+        stopwatchesTTSCounter = new int[]{5, 5, 5, 5, 5};
         buildNotification();
         textToSpeechHelper = new TTSHelper(getApplicationContext());
         alarmReceiver = new BroadcastReceiver() {
@@ -99,7 +103,7 @@ public class svTimerService extends Service {
         registerReceiver(alarmReceiver, intentFilter);
     }
 
-    //TODO: Move this method somewhere else when done
+    //TODO: Move this method back into the receiver when done
     private void handleReceivedAlarm(Intent intent) {
         int timerID = intent.getIntExtra(INTENT_EXTRA_TTS_TIMER_ID, -1);
         switch (timerID) { //Build tts string depending on which timer, and how many elapsed minutes
@@ -140,6 +144,7 @@ public class svTimerService extends Service {
     public void onDestroy() {
         stopExecutor();
         stopForeground(true);
+        unregisterReceiver(alarmReceiver);
         textToSpeechHelper.shutdown();
         Log.d(getClass().getSimpleName(), "Service stopped");
         super.onDestroy();
@@ -174,6 +179,10 @@ public class svTimerService extends Service {
 
     public void startTimer(int viewID) {
         Intent intent = new Intent(INTENT_FILTER_ALARM);
+//        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intent, 0);
+        long now = System.currentTimeMillis();
+        long interval = 60 * 1000;
+
         switch (viewID) {
             case R.id.svTimer0:
                 stopwatches[0].run();
@@ -188,15 +197,18 @@ public class svTimerService extends Service {
                 stopwatches[3].run();
                 break;
             case R.id.svTimer4:
+                if (stopwatches[4].getState() == TimerState.STOPPED) {
+                    intent.putExtra(INTENT_EXTRA_TTS_TIMER_ID, 4);
+                    alarmPendingIntents[4] = PendingIntent.getBroadcast(this, 4, intent, 0);
+                    alarmManager.setRepeating(AlarmManager.RTC, now + interval, interval, alarmPendingIntents[4]);
+                }
                 stopwatches[4].run();
-                intent.putExtra(INTENT_EXTRA_TTS_TIMER_ID, 4);
                 break;
         }
         if (!executorRunning) {
             startExecutor();
         }
-        
-        sendBroadcast(intent);
+        //sendBroadcast(intent);
     }
 
     private void startExecutor() {
@@ -279,6 +291,7 @@ public class svTimerService extends Service {
                 break;
             case 4:
                 stopwatches[4].reset();
+                alarmManager.cancel(alarmPendingIntents[4]);
                 break;
         }
         //Check if any timers are running before stopping the handler
