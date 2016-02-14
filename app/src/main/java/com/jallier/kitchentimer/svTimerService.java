@@ -27,6 +27,7 @@ public class svTimerService extends Service {
     private NotificationCompat.BigTextStyle big;
     private boolean executorRunning = false;
     private boolean serviceBound = true;
+    private TTSHelper textToSpeechHelper;
 
     public svTimerService() {
     }
@@ -78,12 +79,14 @@ public class svTimerService extends Service {
                 new Stopwatch()
         };
         buildNotification();
+        textToSpeechHelper = new TTSHelper(getApplicationContext());
     }
 
     @Override
     public void onDestroy() {
         stopExecutor();
         stopForeground(true);
+        textToSpeechHelper.shutdown();
         Log.d(getClass().getSimpleName(), "Service stopped");
         super.onDestroy();
     }
@@ -225,6 +228,7 @@ public class svTimerService extends Service {
             stopExecutor();
         }
         updateTimers();
+        textToSpeechHelper.speak("Timer reset");
     }
 
     private int numberOfTimersRunning() {

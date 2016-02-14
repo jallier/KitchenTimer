@@ -60,4 +60,8 @@ public class Stopwatch {
     public TimerState getState() {
         return state;
     }
+
+    public long getStartTime() {
+        return startTime;
+    }
 }
