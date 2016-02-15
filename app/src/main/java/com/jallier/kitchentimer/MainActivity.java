@@ -60,9 +60,6 @@ public class MainActivity extends AppCompatActivity {
         } else {
             mainFragment = (MainFragment)getFragmentManager().findFragmentById(android.R.id.content);
         }
-
-        serviceIntent = new Intent(this, svTimerService.class);
-        startService(serviceIntent);
     }
 
     @Override
@@ -84,6 +81,9 @@ public class MainActivity extends AppCompatActivity {
         timer4 = (TextView) findViewById(R.id.svTimer4);
 
         EventBus.getDefault().register(this);
+
+        serviceIntent = new Intent(this, svTimerService.class);
+        startService(serviceIntent);
 
         bindService(serviceIntent, myConnection, Context.BIND_AUTO_CREATE);
         Log.d(LOGTAG, "Service bound");

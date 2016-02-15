@@ -75,7 +75,6 @@ public class svTimerService extends Service {
         }
 
         //Return true so that onRebind is called
-        super.onUnbind(intent);
         return true;
     }
 
@@ -108,7 +107,8 @@ public class svTimerService extends Service {
         stopExecutor();
         stopForeground(true);
         textToSpeechHelper.shutdown();
-        Log.d(getClass().getSimpleName(), "Service stopped");
+        ttsTimer.cancel();
+        Log.d(getClass().getSimpleName(), "Service destroyed");
         super.onDestroy();
     }
 
@@ -430,6 +430,7 @@ public class svTimerService extends Service {
         //Not sure if these two setters are needed.
         intent.setAction(Intent.ACTION_MAIN);
         intent.addCategory(Intent.CATEGORY_LAUNCHER);
+        intent.addFlags(Intent.FLAG_RECEIVER_FOREGROUND);
         return PendingIntent.getActivity(this, 0, intent, 0);
     }
 }
