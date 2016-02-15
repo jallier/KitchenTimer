@@ -24,6 +24,9 @@ public class MainActivity extends AppCompatActivity {
     public final static String INTENT_EXTRA_TIMER2 = "com.jallier.kitchentimer" + ".timer2";
     public final static String INTENT_EXTRA_TIMER3 = "com.jallier.kitchentimer" + ".timer3";
     public final static String INTENT_EXTRA_TIMER4 = "com.jallier.kitchentimer" + ".timer4";
+    public final static String PREF_KEEP_SCREEN_ON = "prefKeepScreenOn";
+    public final static String PREF_SPEAK_ELAPSED = "prefSpeakElapsed";
+    public final static String PREF_SPEAK_INTERVAL = "prefSpeakInterval";
     public final static int NOTIFICATION_ID = 548236;
 
     private TextView timer0, timer1, timer2, timer3, timer4;
@@ -57,9 +60,6 @@ public class MainActivity extends AppCompatActivity {
         } else {
             mainFragment = (MainFragment)getFragmentManager().findFragmentById(android.R.id.content);
         }
-
-        serviceIntent = new Intent(this, svTimerService.class);
-        startService(serviceIntent);
     }
 
     @Override
@@ -81,6 +81,9 @@ public class MainActivity extends AppCompatActivity {
         timer4 = (TextView) findViewById(R.id.svTimer4);
 
         EventBus.getDefault().register(this);
+
+        serviceIntent = new Intent(this, svTimerService.class);
+        startService(serviceIntent);
 
         bindService(serviceIntent, myConnection, Context.BIND_AUTO_CREATE);
         Log.d(LOGTAG, "Service bound");

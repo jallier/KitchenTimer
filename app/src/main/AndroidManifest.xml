@@ -17,7 +17,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".Preferences" />
+        <activity android:name=".Preferences"
+            android:label="@string/settings"
+            android:parentActivityName=".MainActivity"/>
 
         <service
             android:name=".TimerService"

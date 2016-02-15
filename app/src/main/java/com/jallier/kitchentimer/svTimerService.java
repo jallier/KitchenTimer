@@ -1,16 +1,14 @@
 package com.jallier.kitchentimer;
 
-import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.os.Binder;
 import android.os.IBinder;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
@@ -18,6 +16,8 @@ import android.util.Log;
 import org.greenrobot.eventbus.EventBus;
 
 import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -28,16 +28,18 @@ public class svTimerService extends Service {
     private final IBinder myBinder = new MyBinder();
 
     private Stopwatch[] stopwatches;
-    private int[] stopwatchesTTSCounter; //Count elapsed minutes for TTS announcements
-    private PendingIntent[] alarmPendingIntents = new PendingIntent[5];
+    private int[] stopwatchTTSTimeCounter;
+    private TTSTimerTask[] ttsTimerTask;
+    private Timer ttsTimer;
     private ScheduledThreadPoolExecutor executor;
     private NotificationCompat.Builder notifBuilder;
     private NotificationCompat.BigTextStyle big;
     private boolean executorRunning = false;
     private boolean serviceBound = true;
     private TTSHelper textToSpeechHelper;
-    private BroadcastReceiver alarmReceiver;
-    private AlarmManager alarmManager;
+    private SharedPreferences sharedPrefs;
+    private long ttsInterval;
+    private int ttsIntervalMinutes;
 
     public svTimerService() {
     }
@@ -46,6 +48,10 @@ public class svTimerService extends Service {
     public IBinder onBind(Intent intent) {
         Log.d(LOGTAG, "service binds");
         serviceBound = true;
+        //Update sharedprefs and assign interval value
+        sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        ttsIntervalMinutes = Integer.parseInt(sharedPrefs.getString(MainActivity.PREF_SPEAK_INTERVAL, "5"));
+        ttsInterval = ttsIntervalMinutes * 60 * 1000; //Convert to ms
         return myBinder;
     }
 
@@ -53,6 +59,10 @@ public class svTimerService extends Service {
     public void onRebind(Intent intent) {
         stopForeground(true);
         serviceBound = true;
+        //Update sharedprefs and assign interval value
+        sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        ttsIntervalMinutes = Integer.parseInt(sharedPrefs.getString(MainActivity.PREF_SPEAK_INTERVAL, "5"));
+        ttsInterval = ttsIntervalMinutes * 60 * 1000; //Convert to ms
         super.onRebind(intent);
     }
 
@@ -67,7 +77,6 @@ public class svTimerService extends Service {
         }
 
         //Return true so that onRebind is called
-        super.onUnbind(intent);
         return true;
     }
 
@@ -81,7 +90,6 @@ public class svTimerService extends Service {
     public void onCreate() {
         super.onCreate();
         Log.d(LOGTAG, "Service created");
-        alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
         stopwatches = new Stopwatch[]{
                 new Stopwatch(),
                 new Stopwatch(),
@@ -89,64 +97,20 @@ public class svTimerService extends Service {
                 new Stopwatch(),
                 new Stopwatch()
         };
-        stopwatchesTTSCounter = new int[]{5, 5, 5, 5, 5};
+        ttsTimerTask = new TTSTimerTask[5];
+        ttsTimer = new Timer();
+
         buildNotification();
         textToSpeechHelper = new TTSHelper(getApplicationContext());
-        alarmReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                Log.d(LOGTAG, "Alarm broadcast received");
-                handleReceivedAlarm(intent);
-            }
-        };
-        IntentFilter intentFilter = new IntentFilter(INTENT_FILTER_ALARM);
-        registerReceiver(alarmReceiver, intentFilter);
-    }
-
-    //TODO: Move this method back into the receiver when done
-    private void handleReceivedAlarm(Intent intent) {
-        int timerID = intent.getIntExtra(INTENT_EXTRA_TTS_TIMER_ID, -1);
-        switch (timerID) { //Build tts string depending on which timer, and how many elapsed minutes
-            case -1:
-                //Do something here
-            case 4:
-                textToSpeechHelper.speak("Timer " + (timerID + 1) + ". " + convertMinutesToHoursString(stopwatchesTTSCounter[timerID]));
-                stopwatchesTTSCounter[timerID] += 5;
-        }
-    }
-
-    private String convertMinutesToHoursString(int minutes) {
-        String outputString = "";
-        int hours, minutesRemaining;
-        hours = (int) Math.floor(minutes / 60.0);
-        minutesRemaining = minutes % 60;
-        //Hours formatting
-        if (hours < 1) {
-            outputString += (minutesRemaining + " minutes elapsed");
-            return outputString;
-        } else if (hours == 1) {
-            outputString += (hours + " hour ");
-        } else {
-            outputString += (hours + " hours ");
-        }
-
-        //Minutes formatting
-        if (minutesRemaining != 0) {
-            outputString += (minutesRemaining + " minutes ");
-        }
-
-        outputString += "elapsed";
-
-        return outputString;
     }
 
     @Override
     public void onDestroy() {
         stopExecutor();
         stopForeground(true);
-        unregisterReceiver(alarmReceiver);
         textToSpeechHelper.shutdown();
-        Log.d(getClass().getSimpleName(), "Service stopped");
+        ttsTimer.cancel();
+        Log.d(getClass().getSimpleName(), "Service destroyed");
         super.onDestroy();
     }
 
@@ -177,31 +141,84 @@ public class svTimerService extends Service {
         return states;
     }
 
-    public void startTimer(int viewID) {
-        Intent intent = new Intent(INTENT_FILTER_ALARM);
-//        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intent, 0);
-        long now = System.currentTimeMillis();
-        long interval = 60 * 1000;
+    private class TTSTimerTask extends TimerTask {
+        TTSHelper tts;
+        int timerID;
 
+        public TTSTimerTask(TTSHelper tts, int timerID) {
+            this.tts = tts;
+            this.timerID = timerID;
+        }
+
+        private String convertMinutesToHoursString(int minutes) {
+            String outputString = "";
+            int hours, minutesRemaining;
+            hours = (int) Math.floor(minutes / 60.0);
+            minutesRemaining = minutes % 60;
+            //Hours formatting
+            if (hours < 1) {
+                if (minutesRemaining == 1) {
+                    outputString += (minutesRemaining + " minute elapsed");
+                } else {
+                    outputString += (minutesRemaining + " minutes elapsed");
+                }
+                return outputString;
+            } else if (hours == 1) {
+                outputString += (hours + " hour ");
+            } else {
+                outputString += (hours + " hours ");
+            }
+
+            //Minutes formatting
+            if (minutesRemaining != 0) {
+                outputString += (minutesRemaining + " minutes ");
+            }
+
+            outputString += "elapsed";
+
+            return outputString;
+        }
+
+        @Override
+        public void run() {
+            Log.d(LOGTAG, "TimerTask runs - ID " + timerID);
+            //Only announce the time if the sharedpref is set to true
+            sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()); //Update sharedPrefs
+            if (sharedPrefs.getBoolean(MainActivity.PREF_SPEAK_ELAPSED, false)) {
+                String output = "Timer " + (timerID + 1) + ". " + convertMinutesToHoursString(stopwatchTTSTimeCounter[timerID]);
+                stopwatchTTSTimeCounter[timerID] += ttsIntervalMinutes;
+                tts.speak(output);
+            }
+        }
+    }
+
+    public void startTimer(int viewID) {
+        stopwatchTTSTimeCounter = new int[]{ttsIntervalMinutes, ttsIntervalMinutes, ttsIntervalMinutes, ttsIntervalMinutes, ttsIntervalMinutes};
+        int timerID;
         switch (viewID) {
             case R.id.svTimer0:
+                timerID = 0;
+                scheduleTimerTask(timerID);
                 stopwatches[0].run();
                 break;
             case R.id.svTimer1:
+                timerID = 1;
+                scheduleTimerTask(timerID);
                 stopwatches[1].run();
                 break;
             case R.id.svTimer2:
+                timerID = 2;
+                scheduleTimerTask(timerID);
                 stopwatches[2].run();
                 break;
             case R.id.svTimer3:
+                timerID = 3;
+                scheduleTimerTask(timerID);
                 stopwatches[3].run();
                 break;
             case R.id.svTimer4:
-                if (stopwatches[4].getState() == TimerState.STOPPED) {
-                    intent.putExtra(INTENT_EXTRA_TTS_TIMER_ID, 4);
-                    alarmPendingIntents[4] = PendingIntent.getBroadcast(this, 4, intent, 0);
-                    alarmManager.setRepeating(AlarmManager.RTC, now + interval, interval, alarmPendingIntents[4]);
-                }
+                timerID = 4;
+                scheduleTimerTask(timerID);
                 stopwatches[4].run();
                 break;
         }
@@ -209,6 +226,26 @@ public class svTimerService extends Service {
             startExecutor();
         }
         //sendBroadcast(intent);
+    }
+
+    private void scheduleTimerTask(int timerID) {
+        long interval = ttsInterval;
+        long scheduleAt;
+
+        TimerState state = stopwatches[timerID].getState();
+        if (state == TimerState.STOPPED) {
+            //Start a tts task
+            ttsTimerTask[timerID] = new TTSTimerTask(textToSpeechHelper, timerID);
+            ttsTimer.schedule(ttsTimerTask[timerID], interval, interval);
+        } else if (state == TimerState.STARTED) {
+            //cancel current task
+            ttsTimerTask[timerID].cancel();
+        } else {
+            //Work out the time until the next timer should be scheduled, then schedule it
+            scheduleAt = interval - (stopwatches[timerID].getElapsedTime() % interval);
+            ttsTimerTask[timerID] = new TTSTimerTask(textToSpeechHelper, timerID);
+            ttsTimer.schedule(ttsTimerTask[timerID], scheduleAt, interval);
+        }
     }
 
     private void startExecutor() {
@@ -277,21 +314,41 @@ public class svTimerService extends Service {
 
     public void resetTimer(int buttonID) {
         switch (buttonID) {
+            //TODO: This can probably be condensed
             case 0:
                 stopwatches[0].reset();
+                if (ttsTimerTask[0] != null) {
+                    ttsTimerTask[0].cancel();
+                    stopwatchTTSTimeCounter[0] = ttsIntervalMinutes;
+                }
                 break;
             case 1:
                 stopwatches[1].reset();
+                if (ttsTimerTask[1] != null) {
+                    ttsTimerTask[1].cancel();
+                    stopwatchTTSTimeCounter[1] = ttsIntervalMinutes;
+                }
                 break;
             case 2:
                 stopwatches[2].reset();
+                if (ttsTimerTask[2] != null) {
+                    ttsTimerTask[2].cancel();
+                    stopwatchTTSTimeCounter[2] = ttsIntervalMinutes;
+                }
                 break;
             case 3:
                 stopwatches[3].reset();
+                if (ttsTimerTask[3] != null) {
+                    ttsTimerTask[3].cancel();
+                    stopwatchTTSTimeCounter[3] = ttsIntervalMinutes;
+                }
                 break;
             case 4:
                 stopwatches[4].reset();
-                alarmManager.cancel(alarmPendingIntents[4]);
+                if (ttsTimerTask[4] != null) {
+                    ttsTimerTask[4].cancel();
+                    stopwatchTTSTimeCounter[4] = ttsIntervalMinutes;
+                }
                 break;
         }
         //Check if any timers are running before stopping the handler
@@ -376,6 +433,7 @@ public class svTimerService extends Service {
         //Not sure if these two setters are needed.
         intent.setAction(Intent.ACTION_MAIN);
         intent.addCategory(Intent.CATEGORY_LAUNCHER);
+        intent.addFlags(Intent.FLAG_RECEIVER_FOREGROUND);
         return PendingIntent.getActivity(this, 0, intent, 0);
     }
 }
