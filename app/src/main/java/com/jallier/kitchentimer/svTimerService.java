@@ -5,8 +5,10 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Binder;
 import android.os.IBinder;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
@@ -33,6 +35,7 @@ public class svTimerService extends Service {
     private boolean executorRunning = false;
     private boolean serviceBound = true;
     private TTSHelper textToSpeechHelper;
+    private SharedPreferences sharedPrefs;
 
     public svTimerService() {
     }
@@ -171,6 +174,9 @@ public class svTimerService extends Service {
     }
 
     public void startTimer(int viewID) {
+        if (sharedPrefs == null) {
+            sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+        }
         int timerID;
         switch (viewID) {
             case R.id.svTimer0:
@@ -205,6 +211,11 @@ public class svTimerService extends Service {
     }
 
     private void scheduleTimerTask(int timerID) {
+        //If the preference is set to negative, don't do anything
+        if (!sharedPrefs.getBoolean(MainActivity.PREF_SPEAK_ELAPSED, false)) {
+            return;
+        }
+
         long interval = 10000;
         long scheduleAt;
 
@@ -293,28 +304,38 @@ public class svTimerService extends Service {
             //TODO: This can probably be condensed
             case 0:
                 stopwatches[0].reset();
-                ttsTimerTask[0].cancel();
-                stopwatchTTSTimeCounter[0] = 5;
+                if (ttsTimerTask[0] != null) {
+                    ttsTimerTask[0].cancel();
+                    stopwatchTTSTimeCounter[0] = 5;
+                }
                 break;
             case 1:
                 stopwatches[1].reset();
-                ttsTimerTask[1].cancel();
-                stopwatchTTSTimeCounter[1] = 5;
+                if (ttsTimerTask[1] != null) {
+                    ttsTimerTask[1].cancel();
+                    stopwatchTTSTimeCounter[1] = 5;
+                }
                 break;
             case 2:
                 stopwatches[2].reset();
-                ttsTimerTask[2].cancel();
-                stopwatchTTSTimeCounter[2] = 5;
+                if (ttsTimerTask[2] != null) {
+                    ttsTimerTask[2].cancel();
+                    stopwatchTTSTimeCounter[2] = 5;
+                }
                 break;
             case 3:
                 stopwatches[3].reset();
-                ttsTimerTask[3].cancel();
-                stopwatchTTSTimeCounter[3] = 5;
+                if (ttsTimerTask[3] != null) {
+                    ttsTimerTask[3].cancel();
+                    stopwatchTTSTimeCounter[3] = 5;
+                }
                 break;
             case 4:
                 stopwatches[4].reset();
-                ttsTimerTask[4].cancel();
-                stopwatchTTSTimeCounter[4] = 5;
+                if (ttsTimerTask[4] != null) {
+                    ttsTimerTask[4].cancel();
+                    stopwatchTTSTimeCounter[4] = 5;
+                }
                 break;
         }
         //Check if any timers are running before stopping the handler

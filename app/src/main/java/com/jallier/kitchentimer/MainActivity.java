@@ -24,6 +24,9 @@ public class MainActivity extends AppCompatActivity {
     public final static String INTENT_EXTRA_TIMER2 = "com.jallier.kitchentimer" + ".timer2";
     public final static String INTENT_EXTRA_TIMER3 = "com.jallier.kitchentimer" + ".timer3";
     public final static String INTENT_EXTRA_TIMER4 = "com.jallier.kitchentimer" + ".timer4";
+    public final static String PREF_KEEP_SCREEN_ON = "prefKeepScreenOn";
+    public final static String PREF_SPEAK_ELAPSED = "prefSpeakElapsed";
+    public final static String PREF_SPEAK_INTERVAL = "prefSpeakInterval";
     public final static int NOTIFICATION_ID = 548236;
 
     private TextView timer0, timer1, timer2, timer3, timer4;
