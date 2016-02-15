@@ -1,10 +1,8 @@
 package com.jallier.kitchentimer;
 
-import android.app.ActionBar;
 import android.os.Bundle;
 import android.preference.PreferenceFragment;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 
 
 public class Preferences extends AppCompatActivity {

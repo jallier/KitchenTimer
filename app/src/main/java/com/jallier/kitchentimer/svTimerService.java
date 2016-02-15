@@ -161,7 +161,6 @@ public class svTimerService extends Service {
             return outputString;
         }
 
-
         @Override
         public void run() {
             Log.d(LOGTAG, "TimerTask runs - ID " + timerID);
@@ -172,37 +171,56 @@ public class svTimerService extends Service {
     }
 
     public void startTimer(int viewID) {
-        int timerID = 0;
+        int timerID;
         switch (viewID) {
             case R.id.svTimer0:
                 timerID = 0;
+                scheduleTimerTask(timerID);
                 stopwatches[0].run();
-                ttsTimerTask[0] = new TTSTimerTask(textToSpeechHelper, 0);
                 break;
             case R.id.svTimer1:
                 timerID = 1;
+                scheduleTimerTask(timerID);
                 stopwatches[1].run();
-                ttsTimerTask[1] = new TTSTimerTask(textToSpeechHelper, 1);
                 break;
             case R.id.svTimer2:
                 timerID = 2;
+                scheduleTimerTask(timerID);
                 stopwatches[2].run();
-                ttsTimerTask[2] = new TTSTimerTask(textToSpeechHelper, 2);
                 break;
             case R.id.svTimer3:
                 timerID = 3;
+                scheduleTimerTask(timerID);
                 stopwatches[3].run();
-                ttsTimerTask[3] = new TTSTimerTask(textToSpeechHelper, 3);
                 break;
             case R.id.svTimer4:
                 timerID = 4;
+                scheduleTimerTask(timerID);
                 stopwatches[4].run();
-                ttsTimerTask[4] = new TTSTimerTask(textToSpeechHelper, 4);
                 break;
         }
-        ttsTimer.schedule(ttsTimerTask[timerID], 10000, 10000);
         if (!executorRunning) {
             startExecutor();
+        }
+    }
+
+    private void scheduleTimerTask(int timerID) {
+        long interval = 10000;
+        long scheduleAt;
+
+        TimerState state = stopwatches[timerID].getState();
+        if (state == TimerState.STOPPED) {
+            //Start a tts task
+            ttsTimerTask[timerID] = new TTSTimerTask(textToSpeechHelper, timerID);
+            ttsTimer.schedule(ttsTimerTask[timerID], interval, 10000);
+        } else if (state == TimerState.STARTED) {
+            //cancel current task
+            ttsTimerTask[timerID].cancel();
+        } else {
+            //Work out the time until the next timer should be scheduled, then schedule it
+            scheduleAt = interval - (stopwatches[timerID].getElapsedTime() % interval);
+            ttsTimerTask[timerID] = new TTSTimerTask(textToSpeechHelper, timerID);
+            ttsTimer.schedule(ttsTimerTask[timerID], scheduleAt, 10000);
         }
     }
 
@@ -272,6 +290,7 @@ public class svTimerService extends Service {
 
     public void resetTimer(int buttonID) {
         switch (buttonID) {
+            //TODO: This can probably be condensed
             case 0:
                 stopwatches[0].reset();
                 ttsTimerTask[0].cancel();
