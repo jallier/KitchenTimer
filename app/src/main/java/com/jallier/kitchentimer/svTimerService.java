@@ -36,6 +36,8 @@ public class svTimerService extends Service {
     private boolean serviceBound = true;
     private TTSHelper textToSpeechHelper;
     private SharedPreferences sharedPrefs;
+    private long ttsInterval;
+    private int ttsIntervalMinutes;
 
     public svTimerService() {
     }
@@ -44,6 +46,10 @@ public class svTimerService extends Service {
     public IBinder onBind(Intent intent) {
         Log.d(LOGTAG, "service binds");
         serviceBound = true;
+        //Update sharedprefs and assign interval value
+        sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        ttsIntervalMinutes = Integer.parseInt(sharedPrefs.getString(MainActivity.PREF_SPEAK_INTERVAL, "5"));
+        ttsInterval = ttsIntervalMinutes * 60 * 1000; //Convert to ms
         return myBinder;
     }
 
@@ -51,6 +57,10 @@ public class svTimerService extends Service {
     public void onRebind(Intent intent) {
         stopForeground(true);
         serviceBound = true;
+        //Update sharedprefs and assign interval value
+        sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        ttsIntervalMinutes = Integer.parseInt(sharedPrefs.getString(MainActivity.PREF_SPEAK_INTERVAL, "5"));
+        ttsInterval = ttsIntervalMinutes * 60 * 1000; //Convert to ms
         super.onRebind(intent);
     }
 
@@ -86,7 +96,6 @@ public class svTimerService extends Service {
                 new Stopwatch(),
                 new Stopwatch()
         };
-        stopwatchTTSTimeCounter = new int[]{5, 5, 5, 5, 5};
         ttsTimerTask = new TTSTimerTask[5];
         ttsTimer = new Timer();
 
@@ -146,7 +155,11 @@ public class svTimerService extends Service {
             minutesRemaining = minutes % 60;
             //Hours formatting
             if (hours < 1) {
-                outputString += (minutesRemaining + " minutes elapsed");
+                if (minutesRemaining == 1) {
+                    outputString += (minutesRemaining + " minute elapsed");
+                } else {
+                    outputString += (minutesRemaining + " minutes elapsed");
+                }
                 return outputString;
             } else if (hours == 1) {
                 outputString += (hours + " hour ");
@@ -171,13 +184,14 @@ public class svTimerService extends Service {
             sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()); //Update sharedPrefs
             if (sharedPrefs.getBoolean(MainActivity.PREF_SPEAK_ELAPSED, false)) {
                 String output = "Timer " + (timerID + 1) + ". " + convertMinutesToHoursString(stopwatchTTSTimeCounter[timerID]);
-                stopwatchTTSTimeCounter[timerID] += 5;
+                stopwatchTTSTimeCounter[timerID] += ttsIntervalMinutes;
                 tts.speak(output);
             }
         }
     }
 
     public void startTimer(int viewID) {
+        stopwatchTTSTimeCounter = new int[]{ttsIntervalMinutes, ttsIntervalMinutes, ttsIntervalMinutes, ttsIntervalMinutes, ttsIntervalMinutes};
         int timerID;
         switch (viewID) {
             case R.id.svTimer0:
@@ -212,14 +226,14 @@ public class svTimerService extends Service {
     }
 
     private void scheduleTimerTask(int timerID) {
-        long interval = 10000;
+        long interval = ttsInterval;
         long scheduleAt;
 
         TimerState state = stopwatches[timerID].getState();
         if (state == TimerState.STOPPED) {
             //Start a tts task
             ttsTimerTask[timerID] = new TTSTimerTask(textToSpeechHelper, timerID);
-            ttsTimer.schedule(ttsTimerTask[timerID], interval, 10000);
+            ttsTimer.schedule(ttsTimerTask[timerID], interval, interval);
         } else if (state == TimerState.STARTED) {
             //cancel current task
             ttsTimerTask[timerID].cancel();
@@ -227,7 +241,7 @@ public class svTimerService extends Service {
             //Work out the time until the next timer should be scheduled, then schedule it
             scheduleAt = interval - (stopwatches[timerID].getElapsedTime() % interval);
             ttsTimerTask[timerID] = new TTSTimerTask(textToSpeechHelper, timerID);
-            ttsTimer.schedule(ttsTimerTask[timerID], scheduleAt, 10000);
+            ttsTimer.schedule(ttsTimerTask[timerID], scheduleAt, interval);
         }
     }
 
@@ -302,35 +316,35 @@ public class svTimerService extends Service {
                 stopwatches[0].reset();
                 if (ttsTimerTask[0] != null) {
                     ttsTimerTask[0].cancel();
-                    stopwatchTTSTimeCounter[0] = 5;
+                    stopwatchTTSTimeCounter[0] = ttsIntervalMinutes;
                 }
                 break;
             case 1:
                 stopwatches[1].reset();
                 if (ttsTimerTask[1] != null) {
                     ttsTimerTask[1].cancel();
-                    stopwatchTTSTimeCounter[1] = 5;
+                    stopwatchTTSTimeCounter[1] = ttsIntervalMinutes;
                 }
                 break;
             case 2:
                 stopwatches[2].reset();
                 if (ttsTimerTask[2] != null) {
                     ttsTimerTask[2].cancel();
-                    stopwatchTTSTimeCounter[2] = 5;
+                    stopwatchTTSTimeCounter[2] = ttsIntervalMinutes;
                 }
                 break;
             case 3:
                 stopwatches[3].reset();
                 if (ttsTimerTask[3] != null) {
                     ttsTimerTask[3].cancel();
-                    stopwatchTTSTimeCounter[3] = 5;
+                    stopwatchTTSTimeCounter[3] = ttsIntervalMinutes;
                 }
                 break;
             case 4:
                 stopwatches[4].reset();
                 if (ttsTimerTask[4] != null) {
                     ttsTimerTask[4].cancel();
-                    stopwatchTTSTimeCounter[4] = 5;
+                    stopwatchTTSTimeCounter[4] = ttsIntervalMinutes;
                 }
                 break;
         }

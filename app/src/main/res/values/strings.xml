@@ -21,7 +21,7 @@
     <string name="settingsKeepScreenOnSummary">Prevent the screen from turning off while timers are running</string>
 
     <!-- Notifications -->
-    <string name="notifTimersRunning">Timers Running</string>
+    <string name="notifTimersRunning">Kitchen Timer</string>
     <string name="notifTimersNumber">Timer</string>
     <string name="notifXTimersRunning"> timers running</string>
     <string name="notifAction">Open app</string>
