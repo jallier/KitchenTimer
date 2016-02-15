@@ -167,16 +167,17 @@ public class svTimerService extends Service {
         @Override
         public void run() {
             Log.d(LOGTAG, "TimerTask runs - ID " + timerID);
-            String output = "Timer " + (timerID + 1) + ". " + convertMinutesToHoursString(stopwatchTTSTimeCounter[timerID]);
-            stopwatchTTSTimeCounter[timerID] += 5;
-            tts.speak(output);
+            //Only announce the time if the sharedpref is set to true
+            sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()); //Update sharedPrefs
+            if (sharedPrefs.getBoolean(MainActivity.PREF_SPEAK_ELAPSED, false)) {
+                String output = "Timer " + (timerID + 1) + ". " + convertMinutesToHoursString(stopwatchTTSTimeCounter[timerID]);
+                stopwatchTTSTimeCounter[timerID] += 5;
+                tts.speak(output);
+            }
         }
     }
 
     public void startTimer(int viewID) {
-        if (sharedPrefs == null) {
-            sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
-        }
         int timerID;
         switch (viewID) {
             case R.id.svTimer0:
@@ -211,11 +212,6 @@ public class svTimerService extends Service {
     }
 
     private void scheduleTimerTask(int timerID) {
-        //If the preference is set to negative, don't do anything
-        if (!sharedPrefs.getBoolean(MainActivity.PREF_SPEAK_ELAPSED, false)) {
-            return;
-        }
-
         long interval = 10000;
         long scheduleAt;
 
