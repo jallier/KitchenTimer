@@ -13,8 +13,7 @@
             android:key="prefSpeakElapsed"
             android:summary="@string/speakElapsedSummary"
             android:title="@string/speakElapsedTitle"/>
-        <EditTextPreference
-            android:inputType="number"
+        <com.jallier.kitchentimer.NumberPickerPreference
             android:defaultValue="@string/speakElapsedDefaultInterval"
             android:key="prefSpeakInterval"
             android:summary="@string/speakElapsedIntervalSummary"

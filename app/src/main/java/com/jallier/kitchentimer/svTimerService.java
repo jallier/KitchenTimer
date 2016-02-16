@@ -23,8 +23,6 @@ import java.util.concurrent.TimeUnit;
 
 public class svTimerService extends Service {
     private final String LOGTAG = getClass().getSimpleName();
-    private final String INTENT_FILTER_ALARM = "com.jallier.kitchentimer" + ".alarmFilter";
-    private final String INTENT_EXTRA_TTS_TIMER_ID = "com.jallier.kitchentimer" + ".tts";
     private final IBinder myBinder = new MyBinder();
 
     private Stopwatch[] stopwatches;

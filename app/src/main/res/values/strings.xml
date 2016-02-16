@@ -16,6 +16,8 @@
     <string name="speakElapsedIntervalTitle">Interval (minutes)</string>
     <string name="speakElapsedIntervalSummary">Intervals TTS will announce the elapsed time</string>
     <string name="speakElapsedDefaultInterval">5</string>
+    <string name="okButton">OK</string>
+    <string name="cancelButton">Cancel</string>
 
     <string name="settingsKeepScreenOnTitle">Keep screen on</string>
     <string name="settingsKeepScreenOnSummary">Prevent the screen from turning off while timers are running</string>
