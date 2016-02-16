@@ -377,8 +377,9 @@ public class svTimerService extends Service {
             elapsedTimeValues[i] = stopwatch.getStringElapsedTime();
             i++;
         }
-        postEventToActivity(elapsedTimeValues);
-        if (!serviceBound) {
+        if (serviceBound) {
+            postEventToActivity(elapsedTimeValues);
+        } else {
             raiseNotification(false);
         }
     }
