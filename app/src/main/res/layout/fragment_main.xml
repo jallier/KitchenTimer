@@ -47,7 +47,8 @@
                 android:layout_weight="2"
                 android:gravity="bottom|center_horizontal"
                 android:maxLines="1"
-                autofit:minTextSize="35sp"/>
+                autofit:minTextSize="35sp"
+                android:clickable="true"/>
 
             <com.jallier.kitchentimer.SquareButton
                 android:id="@+id/svBtnReset0"
@@ -87,7 +88,8 @@
                 android:gravity="bottom|center_horizontal"
                 android:maxLines="1"
                 android:singleLine="false"
-                autofit:minTextSize="35sp"/>
+                autofit:minTextSize="35sp"
+                android:clickable="true"/>
 
             <com.jallier.kitchentimer.SquareButton
                 android:id="@+id/svBtnReset1"
@@ -135,7 +137,8 @@
                 android:gravity="bottom|center_horizontal"
                 android:maxLines="1"
                 android:singleLine="false"
-                autofit:minTextSize="35sp"/>
+                autofit:minTextSize="35sp"
+                android:clickable="true"/>
 
             <com.jallier.kitchentimer.SquareButton
                 android:id="@+id/svBtnReset2"
@@ -176,7 +179,8 @@
                 android:maxLines="1"
                 android:singleLine="false"
                 autofit:minTextSize="35sp"
-                android:nestedScrollingEnabled="false"/>
+                android:nestedScrollingEnabled="false"
+                android:clickable="true"/>
 
             <com.jallier.kitchentimer.SquareButton
                 android:id="@+id/svBtnReset3"
@@ -211,7 +215,8 @@
             android:maxLines="1"
             autofit:minTextSize="45sp"
             android:layout_weight="2"
-            android:gravity="bottom|center_horizontal"/>
+            android:gravity="bottom|center_horizontal"
+            android:clickable="true"/>
 
         <com.jallier.kitchentimer.SquareButton
             style="?android:attr/buttonStyleSmall"
