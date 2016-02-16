@@ -2,10 +2,12 @@ package com.jallier.kitchentimer;
 
 import android.content.Context;
 import android.media.AudioManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
 import android.util.Log;
 
+import java.util.HashMap;
 import java.util.Locale;
 
 public class TTSHelper implements TextToSpeech.OnInitListener {
@@ -27,7 +29,13 @@ public class TTSHelper implements TextToSpeech.OnInitListener {
 
     public void speak(String words) {
         Log.d(LOGTAG, "TTS uttering: " + words);
-        tts.speak(words, TextToSpeech.QUEUE_ADD, paramBundle, null);
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            tts.speak(words, TextToSpeech.QUEUE_ADD, paramBundle, null);
+        } else {
+            HashMap<String, String> ttsStream = new HashMap<>();
+            ttsStream.put(TextToSpeech.Engine.KEY_PARAM_STREAM, String.valueOf(AudioManager.STREAM_NOTIFICATION));
+            tts.speak(words, TextToSpeech.QUEUE_ADD, ttsStream);
+        }
     }
 
     public void shutdown() {
