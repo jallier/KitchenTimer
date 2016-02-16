@@ -13,8 +13,8 @@
     <string name="settingsHeaderTTSDesc">Settings for TTS</string>
     <string name="speakElapsedTitle">Announce Elapsed Time</string>
     <string name="speakElapsedSummary">Announce a timers elapsed time every interval using text-to-speech</string>
-    <string name="speakElapsedIntervalTitle">Interval</string>
-    <string name="speakElapsedIntervalSummary">Intervals TTS will announce the elapsed time (in minutes)</string>
+    <string name="speakElapsedIntervalTitle">Interval (minutes)</string>
+    <string name="speakElapsedIntervalSummary">Intervals TTS will announce the elapsed time</string>
     <string name="speakElapsedDefaultInterval">5</string>
 
     <string name="settingsKeepScreenOnTitle">Keep screen on</string>
