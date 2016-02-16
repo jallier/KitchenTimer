@@ -22,10 +22,6 @@
             android:parentActivityName=".MainActivity"/>
 
         <service
-            android:name=".TimerService"
-            android:enabled="true"
-            android:exported="false" />
-        <service
             android:name=".svTimerService"
             android:enabled="true"
             android:exported="false"/>
