@@ -186,11 +186,18 @@ public class MainActivity extends AppCompatActivity {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEvent(TimerTickEvent event) {
+        //TODO: add some loops to make this cleaner
         Log.d(LOGTAG, "Timer Tick event received");
-        timer0.setText(event.getState(INTENT_EXTRA_TIMER0));
-        timer1.setText(event.getState(INTENT_EXTRA_TIMER1));
-        timer2.setText(event.getState(INTENT_EXTRA_TIMER2));
-        timer3.setText(event.getState(INTENT_EXTRA_TIMER3));
-        timer4.setText(event.getState(INTENT_EXTRA_TIMER4));
+        timer0.setText(event.getElapsed(INTENT_EXTRA_TIMER0));
+        timer1.setText(event.getElapsed(INTENT_EXTRA_TIMER1));
+        timer2.setText(event.getElapsed(INTENT_EXTRA_TIMER2));
+        timer3.setText(event.getElapsed(INTENT_EXTRA_TIMER3));
+        timer4.setText(event.getElapsed(INTENT_EXTRA_TIMER4));
+
+        timer0.setAlpha(event.getVisibility(INTENT_EXTRA_TIMER0));
+        timer1.setAlpha(event.getVisibility(INTENT_EXTRA_TIMER1));
+        timer2.setAlpha(event.getVisibility(INTENT_EXTRA_TIMER2));
+        timer3.setAlpha(event.getVisibility(INTENT_EXTRA_TIMER3));
+        timer4.setAlpha(event.getVisibility(INTENT_EXTRA_TIMER4));
     }
 }

@@ -209,7 +209,7 @@ public class svTimerService extends Service {
             stopExecutor();
         }
         updateTimers();
-        textToSpeechHelper.speak("Timer reset");
+        //textToSpeechHelper.speak("Timer reset");
     }
 
     private int numberOfTimersRunning() {
@@ -233,25 +233,33 @@ public class svTimerService extends Service {
         return states;
     }
 
-    private void postEventToActivity(String[] timerValues) {
+    private void postEventToActivity(String[] timerValues, int[] visibilityValues) {
         TimerTickEvent event = new TimerTickEvent();
-        event.addState(MainActivity.INTENT_EXTRA_TIMER0, timerValues[0]);
-        event.addState(MainActivity.INTENT_EXTRA_TIMER1, timerValues[1]);
-        event.addState(MainActivity.INTENT_EXTRA_TIMER2, timerValues[2]);
-        event.addState(MainActivity.INTENT_EXTRA_TIMER3, timerValues[3]);
-        event.addState(MainActivity.INTENT_EXTRA_TIMER4, timerValues[4]);
+        event.setElapsed(MainActivity.INTENT_EXTRA_TIMER0, timerValues[0]);
+        event.setElapsed(MainActivity.INTENT_EXTRA_TIMER1, timerValues[1]);
+        event.setElapsed(MainActivity.INTENT_EXTRA_TIMER2, timerValues[2]);
+        event.setElapsed(MainActivity.INTENT_EXTRA_TIMER3, timerValues[3]);
+        event.setElapsed(MainActivity.INTENT_EXTRA_TIMER4, timerValues[4]);
+
+        event.setVisibility(MainActivity.INTENT_EXTRA_TIMER0, visibilityValues[0]);
+        event.setVisibility(MainActivity.INTENT_EXTRA_TIMER1, visibilityValues[1]);
+        event.setVisibility(MainActivity.INTENT_EXTRA_TIMER2, visibilityValues[2]);
+        event.setVisibility(MainActivity.INTENT_EXTRA_TIMER3, visibilityValues[3]);
+        event.setVisibility(MainActivity.INTENT_EXTRA_TIMER4, visibilityValues[4]);
         EventBus.getDefault().post(event);
     }
 
     private void updateTimers() {
         String[] elapsedTimeValues = new String[stopwatches.length];
+        int[] visibilityValues = new int[stopwatches.length];
         int i = 0;
         for (Stopwatch stopwatch : stopwatches) {
             elapsedTimeValues[i] = stopwatch.getStringElapsedTime();
+            visibilityValues[i] = stopwatch.isTimerVisible();
             i++;
         }
         if (serviceBound) {
-            postEventToActivity(elapsedTimeValues);
+            postEventToActivity(elapsedTimeValues, visibilityValues);
         } else {
             raiseNotification(false);
         }
