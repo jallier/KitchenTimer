@@ -2,7 +2,7 @@ package com.jallier.kitchentimer;
 
 import android.support.v4.util.SimpleArrayMap;
 
-public class TimerTickEvent {
+class TimerTickEvent {
     private SimpleArrayMap<String, String> states;
 
     public TimerTickEvent() {

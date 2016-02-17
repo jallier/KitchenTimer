@@ -10,7 +10,7 @@ import android.util.Log;
 import java.util.HashMap;
 import java.util.Locale;
 
-public class TTSHelper implements TextToSpeech.OnInitListener {
+class TTSHelper implements TextToSpeech.OnInitListener {
     private final String LOGTAG = getClass().getSimpleName();
     private TextToSpeech tts;
     private Bundle paramBundle;

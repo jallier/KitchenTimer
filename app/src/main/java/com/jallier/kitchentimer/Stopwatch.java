@@ -3,7 +3,7 @@ package com.jallier.kitchentimer;
 import android.os.SystemClock;
 import android.util.Log;
 
-public class Stopwatch {
+class Stopwatch {
     public Stopwatch() {
         elapsedTime = 0;
     }

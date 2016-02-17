@@ -141,26 +141,6 @@ public class svTimerService extends Service {
         return super.onStartCommand(intent, flags, startId);
     }
 
-    private void postEventToActivity(String[] timerValues) {
-        TimerTickEvent event = new TimerTickEvent();
-        event.addState(MainActivity.INTENT_EXTRA_TIMER0, timerValues[0]);
-        event.addState(MainActivity.INTENT_EXTRA_TIMER1, timerValues[1]);
-        event.addState(MainActivity.INTENT_EXTRA_TIMER2, timerValues[2]);
-        event.addState(MainActivity.INTENT_EXTRA_TIMER3, timerValues[3]);
-        event.addState(MainActivity.INTENT_EXTRA_TIMER4, timerValues[4]);
-        EventBus.getDefault().post(event);
-    }
-
-    public TimerState[] getTimerStates() {
-        TimerState[] states = new TimerState[stopwatches.length];
-        int i = 0;
-        for (Stopwatch stopwatch : stopwatches) {
-            states[i] = stopwatch.getState();
-            i++;
-        }
-        return states;
-    }
-
     public void startTimer(int timerID) {
         stopwatches[timerID].run();
         Intent intent = new Intent(INTENT_TIMER_BASE + timerID);
@@ -168,58 +148,6 @@ public class svTimerService extends Service {
 
         if (!executorRunning) {
             startExecutor();
-        }
-    }
-
-    private class AlarmReceiver extends BroadcastReceiver {
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
-            final PowerManager.WakeLock wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "Alarm");
-            wakeLock.acquire();
-
-            String action = intent.getAction();
-            int timerID = Integer.parseInt(action.substring(action.length() - 1));
-            sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()); //Update sharedPrefs
-            if (sharedPrefs.getBoolean(MainActivity.PREF_SPEAK_ELAPSED, false)) {
-                String output = "Timer " + (timerID + 1) + ". " + convertMinutesToHoursString(stopwatchTTSTimeCounter[timerID]);
-                stopwatchTTSTimeCounter[timerID] += ttsIntervalMinutes;
-                textToSpeechHelper.speak(output);
-
-                //Might be best to have this fire every time regardless, so if tts is enabled half way through, it will work.
-                alarmManager.setExact(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + ttsInterval, pendingIntents[timerID]);
-                wakeLock.release();
-            }
-        }
-
-        private String convertMinutesToHoursString(int minutes) {
-            String outputString = "";
-            int hours, minutesRemaining;
-            hours = (int) Math.floor(minutes / 60.0);
-            minutesRemaining = minutes % 60;
-            //Hours formatting
-            if (hours < 1) {
-                if (minutesRemaining == 1) {
-                    outputString += (minutesRemaining + " minute elapsed");
-                } else {
-                    outputString += (minutesRemaining + " minutes elapsed");
-                }
-                return outputString;
-            } else if (hours == 1) {
-                outputString += (hours + " hour ");
-            } else {
-                outputString += (hours + " hours ");
-            }
-
-            //Minutes formatting
-            if (minutesRemaining != 0) {
-                outputString += (minutesRemaining + " minutes ");
-            }
-
-            outputString += "elapsed";
-
-            return outputString;
         }
     }
 
@@ -269,44 +197,6 @@ public class svTimerService extends Service {
         }
     }
 
-    public void restartTimer(int viewID) {
-        //TODO: Restructure timer code to use different methods for start/pause/reset
-        switch (viewID) {
-            case R.id.svTimer0:
-                stopwatches[0].run();
-                break;
-            case R.id.svTimer1:
-                stopwatches[1].run();
-                break;
-            case R.id.svTimer2:
-                stopwatches[2].run();
-                break;
-            case R.id.svTimer3:
-                stopwatches[3].run();
-                break;
-        }
-        updateTimers();
-    }
-
-    public void pauseTimer(int viewID) {
-        //TODO: make this cleaner in the stopwatches code
-        switch (viewID) {
-            case R.id.svTimer0:
-                stopwatches[0].run();
-                break;
-            case R.id.svTimer1:
-                stopwatches[1].run();
-                break;
-            case R.id.svTimer2:
-                stopwatches[2].run();
-                break;
-            case R.id.svTimer3:
-                stopwatches[3].run();
-                break;
-        }
-        updateTimers();
-    }
-
     public void resetTimer(int buttonID) {
         stopwatches[buttonID].reset();
         if (pendingIntents[buttonID] != null) {
@@ -333,7 +223,27 @@ public class svTimerService extends Service {
         return i;
     }
 
-    public void updateTimers() {
+    public TimerState[] getTimerStates() {
+        TimerState[] states = new TimerState[stopwatches.length];
+        int i = 0;
+        for (Stopwatch stopwatch : stopwatches) {
+            states[i] = stopwatch.getState();
+            i++;
+        }
+        return states;
+    }
+
+    private void postEventToActivity(String[] timerValues) {
+        TimerTickEvent event = new TimerTickEvent();
+        event.addState(MainActivity.INTENT_EXTRA_TIMER0, timerValues[0]);
+        event.addState(MainActivity.INTENT_EXTRA_TIMER1, timerValues[1]);
+        event.addState(MainActivity.INTENT_EXTRA_TIMER2, timerValues[2]);
+        event.addState(MainActivity.INTENT_EXTRA_TIMER3, timerValues[3]);
+        event.addState(MainActivity.INTENT_EXTRA_TIMER4, timerValues[4]);
+        EventBus.getDefault().post(event);
+    }
+
+    private void updateTimers() {
         String[] elapsedTimeValues = new String[stopwatches.length];
         int i = 0;
         for (Stopwatch stopwatch : stopwatches) {
@@ -399,5 +309,57 @@ public class svTimerService extends Service {
         intent.addCategory(Intent.CATEGORY_LAUNCHER);
         intent.addFlags(Intent.FLAG_RECEIVER_FOREGROUND);
         return PendingIntent.getActivity(this, 0, intent, 0);
+    }
+
+    private class AlarmReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
+            final PowerManager.WakeLock wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "Alarm");
+            wakeLock.acquire();
+
+            String action = intent.getAction();
+            int timerID = Integer.parseInt(action.substring(action.length() - 1));
+            sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()); //Update sharedPrefs
+            if (sharedPrefs.getBoolean(MainActivity.PREF_SPEAK_ELAPSED, false)) {
+                String output = "Timer " + (timerID + 1) + ". " + convertMinutesToHoursString(stopwatchTTSTimeCounter[timerID]);
+                stopwatchTTSTimeCounter[timerID] += ttsIntervalMinutes;
+                textToSpeechHelper.speak(output);
+
+                //Might be best to have this fire every time regardless, so if tts is enabled half way through, it will work.
+                alarmManager.setExact(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + ttsInterval, pendingIntents[timerID]);
+                wakeLock.release();
+            }
+        }
+
+        private String convertMinutesToHoursString(int minutes) {
+            String outputString = "";
+            int hours, minutesRemaining;
+            hours = (int) Math.floor(minutes / 60.0);
+            minutesRemaining = minutes % 60;
+            //Hours formatting
+            if (hours < 1) {
+                if (minutesRemaining == 1) {
+                    outputString += (minutesRemaining + " minute elapsed");
+                } else {
+                    outputString += (minutesRemaining + " minutes elapsed");
+                }
+                return outputString;
+            } else if (hours == 1) {
+                outputString += (hours + " hour ");
+            } else {
+                outputString += (hours + " hours ");
+            }
+
+            //Minutes formatting
+            if (minutesRemaining != 0) {
+                outputString += (minutesRemaining + " minutes ");
+            }
+
+            outputString += "elapsed";
+
+            return outputString;
+        }
     }
 }

@@ -17,9 +17,9 @@ import android.widget.NumberPicker;
 public class NumberPickerPreference extends DialogPreference {
 
     // Allowed range of values
-    public static final int MIN_VALUE = 1;
-    public static final int MAX_VALUE = 100;
-    public static final boolean WRAP_SELECTOR_WHEEL = true; // enable or disable the 'circular behavior'
+    private static final int MIN_VALUE = 1;
+    private static final int MAX_VALUE = 100;
+    private static final boolean WRAP_SELECTOR_WHEEL = true; // enable or disable the 'circular behavior'
     private NumberPicker picker;
     private String value;
 
@@ -76,12 +76,12 @@ public class NumberPickerPreference extends DialogPreference {
         setValue(restorePersistedValue ? getPersistedString("MIN_VALUE") : ""+defaultValue);
     }
 
-    public void setValue(String value) {
+    private void setValue(String value) {
         this.value = value;
         persistString(this.value);
     }
 
-    public String getValue() {
+    private String getValue() {
         return this.value;
     }
 }
