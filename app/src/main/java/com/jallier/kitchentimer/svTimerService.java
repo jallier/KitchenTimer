@@ -303,18 +303,13 @@ public class svTimerService extends Service {
         TimerState state = stopwatches[timerID].getState();
         if (state == TimerState.STOPPED) {
             //Start a tts task
-//            ttsTimerTask[timerID] = new TTSTimerTask(textToSpeechHelper, timerID);
-//            ttsTimer.schedule(ttsTimerTask[timerID], interval, interval);
             alarmManager.setExact(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + interval, pendingIntents[timerID]);
         } else if (state == TimerState.STARTED) {
             //cancel current task
-//            ttsTimerTask[timerID].cancel();
             alarmManager.cancel(pendingIntents[timerID]);
         } else {
             //Work out the time until the next timer should be scheduled, then schedule it
             scheduleAt = interval - (stopwatches[timerID].getElapsedTime() % interval);
-//            ttsTimerTask[timerID] = new TTSTimerTask(textToSpeechHelper, timerID);
-//            ttsTimer.schedule(ttsTimerTask[timerID], scheduleAt, interval);
             alarmManager.setExact(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + scheduleAt, pendingIntents[timerID]);
         }
     }
@@ -388,39 +383,42 @@ public class svTimerService extends Service {
             //TODO: This can probably be condensed
             case 0:
                 stopwatches[0].reset();
-                if (ttsTimerTask[0] != null) {
-                    ttsTimerTask[0].cancel();
+                if (pendingIntents[0] != null) {
+                    //ttsTimerTask[0].cancel();
                     stopwatchTTSTimeCounter[0] = ttsIntervalMinutes;
+                    alarmManager.cancel(pendingIntents[0]);
                 }
                 break;
             case 1:
                 stopwatches[1].reset();
-                if (ttsTimerTask[1] != null) {
-                    ttsTimerTask[1].cancel();
+                if (pendingIntents[1] != null) {
+                    //ttsTimerTask[1].cancel();
                     stopwatchTTSTimeCounter[1] = ttsIntervalMinutes;
+                    alarmManager.cancel(pendingIntents[1]);
                 }
                 break;
             case 2:
                 stopwatches[2].reset();
-                if (ttsTimerTask[2] != null) {
-                    ttsTimerTask[2].cancel();
+                if (pendingIntents[2] != null) {
+                    //ttsTimerTask[2].cancel();
                     stopwatchTTSTimeCounter[2] = ttsIntervalMinutes;
+                    alarmManager.cancel(pendingIntents[2]);
                 }
                 break;
             case 3:
                 stopwatches[3].reset();
-                if (ttsTimerTask[3] != null) {
-                    ttsTimerTask[3].cancel();
+                if (pendingIntents[3] != null) {
+                    //ttsTimerTask[3].cancel();
                     stopwatchTTSTimeCounter[3] = ttsIntervalMinutes;
+                    alarmManager.cancel(pendingIntents[3]);
                 }
                 break;
             case 4:
                 stopwatches[4].reset();
-                if (ttsTimerTask[4] != null) {
-                    ttsTimerTask[4].cancel();
+                if (pendingIntents[4] != null) {
                     stopwatchTTSTimeCounter[4] = ttsIntervalMinutes;
+                    alarmManager.cancel(pendingIntents[4]);
                 }
-                alarmManager.cancel(pendingIntents[4]);
                 break;
         }
         //Check if any timers are running before stopping the handler
