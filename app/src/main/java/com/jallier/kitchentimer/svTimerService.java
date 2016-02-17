@@ -337,44 +337,12 @@ public class svTimerService extends Service {
     }
 
     public void resetTimer(int buttonID) {
-        switch (buttonID) {
-            //TODO: This can probably be condensed
-            case 0:
-                stopwatches[0].reset();
-                if (pendingIntents[0] != null) {
-                    stopwatchTTSTimeCounter[0] = ttsIntervalMinutes;
-                    alarmManager.cancel(pendingIntents[0]);
-                }
-                break;
-            case 1:
-                stopwatches[1].reset();
-                if (pendingIntents[1] != null) {
-                    stopwatchTTSTimeCounter[1] = ttsIntervalMinutes;
-                    alarmManager.cancel(pendingIntents[1]);
-                }
-                break;
-            case 2:
-                stopwatches[2].reset();
-                if (pendingIntents[2] != null) {
-                    stopwatchTTSTimeCounter[2] = ttsIntervalMinutes;
-                    alarmManager.cancel(pendingIntents[2]);
-                }
-                break;
-            case 3:
-                stopwatches[3].reset();
-                if (pendingIntents[3] != null) {
-                    stopwatchTTSTimeCounter[3] = ttsIntervalMinutes;
-                    alarmManager.cancel(pendingIntents[3]);
-                }
-                break;
-            case 4:
-                stopwatches[4].reset();
-                if (pendingIntents[4] != null) {
-                    stopwatchTTSTimeCounter[4] = ttsIntervalMinutes;
-                    alarmManager.cancel(pendingIntents[4]);
-                }
-                break;
+        stopwatches[buttonID].reset();
+        if (pendingIntents[buttonID] != null) {
+            stopwatchTTSTimeCounter[buttonID] = ttsIntervalMinutes;
+            alarmManager.cancel(pendingIntents[buttonID]);
         }
+
         //Check if any timers are running before stopping the handler
         if (numberOfTimersRunning() < 1) {
             stopExecutor();
