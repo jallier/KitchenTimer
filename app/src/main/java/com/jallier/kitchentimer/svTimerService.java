@@ -30,6 +30,12 @@ import java.util.concurrent.TimeUnit;
 public class svTimerService extends Service {
     private final String LOGTAG = getClass().getSimpleName();
     private final IBinder myBinder = new MyBinder();
+    private final AlarmReceiver alarmReceiver = new AlarmReceiver();
+    private final String INTENT_TIMER0 = "TIMER0";
+    private final String INTENT_TIMER1 = "TIMER1";
+    private final String INTENT_TIMER2 = "TIMER2";
+    private final String INTENT_TIMER3 = "TIMER3";
+    private final String INTENT_TIMER4 = "TIMER4";
 
     private Stopwatch[] stopwatches;
     private int[] stopwatchTTSTimeCounter;
@@ -46,7 +52,6 @@ public class svTimerService extends Service {
     private int ttsIntervalMinutes;
     private PendingIntent[] pendingIntents;
     private AlarmManager alarmManager;
-    private final AlarmReceiver alarmReceiver = new AlarmReceiver();
 
     public svTimerService() {
     }
@@ -113,7 +118,13 @@ public class svTimerService extends Service {
         textToSpeechHelper = new TTSHelper(getApplicationContext());
         //Intent intent = new Intent("TTS_ALARM");
         //pendingIntents = PendingIntent.getBroadcast(getApplicationContext(), 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-        registerReceiver(alarmReceiver, new IntentFilter("TTS_ALARM"));
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(INTENT_TIMER0);
+        intentFilter.addAction(INTENT_TIMER1);
+        intentFilter.addAction(INTENT_TIMER2);
+        intentFilter.addAction(INTENT_TIMER3);
+        intentFilter.addAction(INTENT_TIMER4);
+        registerReceiver(alarmReceiver, intentFilter);
     }
 
     @Override
@@ -207,30 +218,36 @@ public class svTimerService extends Service {
 
     public void startTimer(int viewID) {
         int timerID;
+        Intent intent;
         switch (viewID) {
             case R.id.svTimer0:
                 timerID = 0;
-                scheduleTimerTask(timerID);
+                intent = new Intent(INTENT_TIMER0);
+                scheduleTimerTask(timerID, intent);
                 stopwatches[0].run();
                 break;
             case R.id.svTimer1:
                 timerID = 1;
-                scheduleTimerTask(timerID);
+                intent = new Intent(INTENT_TIMER1);
+                scheduleTimerTask(timerID, intent);
                 stopwatches[1].run();
                 break;
             case R.id.svTimer2:
                 timerID = 2;
-                scheduleTimerTask(timerID);
+                intent = new Intent(INTENT_TIMER2);
+                scheduleTimerTask(timerID, intent);
                 stopwatches[2].run();
                 break;
             case R.id.svTimer3:
                 timerID = 3;
-                scheduleTimerTask(timerID);
+                intent = new Intent(INTENT_TIMER3);
+                scheduleTimerTask(timerID, intent);
                 stopwatches[3].run();
                 break;
             case R.id.svTimer4:
                 timerID = 4;
-                scheduleTimerTask(timerID);
+                intent = new Intent(INTENT_TIMER4);
+                scheduleTimerTask(timerID, intent);
                 stopwatches[4].run();
                 break;
         }
@@ -248,7 +265,8 @@ public class svTimerService extends Service {
             final PowerManager.WakeLock wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "Alarm");
             wakeLock.acquire();
 
-            int timerID = intent.getIntExtra("ID", 0);
+            String action = intent.getAction();
+            int timerID = Integer.parseInt(action.substring(action.length() - 1));
             sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()); //Update sharedPrefs
             if (sharedPrefs.getBoolean(MainActivity.PREF_SPEAK_ELAPSED, false)) {
                 String output = "Timer " + (timerID + 1) + ". " + convertMinutesToHoursString(stopwatchTTSTimeCounter[timerID]);
@@ -292,13 +310,11 @@ public class svTimerService extends Service {
         }
     }
 
-    private void scheduleTimerTask(int timerID) {
+    private void scheduleTimerTask(int timerID, Intent intent) {
         long interval = ttsInterval;
         long scheduleAt;
 
         alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
-        Intent intent = new Intent("TTS_ALARM");
-        intent.putExtra("ID", timerID);
         pendingIntents[timerID] = PendingIntent.getBroadcast(getApplicationContext(), 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         TimerState state = stopwatches[timerID].getState();
         if (state == TimerState.STOPPED) {
