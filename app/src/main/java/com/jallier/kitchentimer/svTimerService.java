@@ -142,9 +142,9 @@ public class svTimerService extends Service {
     }
 
     public void startTimer(int timerID) {
-        stopwatches[timerID].run();
         Intent intent = new Intent(INTENT_TIMER_BASE + timerID);
         scheduleTimerTask(timerID, intent);
+        stopwatches[timerID].run();
 
         if (!executorRunning) {
             startExecutor();
@@ -315,6 +315,7 @@ public class svTimerService extends Service {
 
         @Override
         public void onReceive(Context context, Intent intent) {
+            Log.d(LOGTAG, "Alarm received");
             PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
             final PowerManager.WakeLock wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "Alarm");
             wakeLock.acquire();
