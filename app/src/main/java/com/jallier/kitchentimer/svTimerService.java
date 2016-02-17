@@ -29,6 +29,7 @@ public class svTimerService extends Service {
     private final String LOGTAG = getClass().getSimpleName();
     private final IBinder myBinder = new MyBinder();
     private final AlarmReceiver alarmReceiver = new AlarmReceiver();
+    private final String INTENT_TIMER_BASE = "TIMER";
     private final String INTENT_TIMER0 = "TIMER0";
     private final String INTENT_TIMER1 = "TIMER1";
     private final String INTENT_TIMER2 = "TIMER2";
@@ -160,41 +161,11 @@ public class svTimerService extends Service {
         return states;
     }
 
-    public void startTimer(int viewID) {
-        int timerID;
-        Intent intent;
-        switch (viewID) {
-            case R.id.svTimer0:
-                timerID = 0;
-                intent = new Intent(INTENT_TIMER0);
-                scheduleTimerTask(timerID, intent);
-                stopwatches[0].run();
-                break;
-            case R.id.svTimer1:
-                timerID = 1;
-                intent = new Intent(INTENT_TIMER1);
-                scheduleTimerTask(timerID, intent);
-                stopwatches[1].run();
-                break;
-            case R.id.svTimer2:
-                timerID = 2;
-                intent = new Intent(INTENT_TIMER2);
-                scheduleTimerTask(timerID, intent);
-                stopwatches[2].run();
-                break;
-            case R.id.svTimer3:
-                timerID = 3;
-                intent = new Intent(INTENT_TIMER3);
-                scheduleTimerTask(timerID, intent);
-                stopwatches[3].run();
-                break;
-            case R.id.svTimer4:
-                timerID = 4;
-                intent = new Intent(INTENT_TIMER4);
-                scheduleTimerTask(timerID, intent);
-                stopwatches[4].run();
-                break;
-        }
+    public void startTimer(int timerID) {
+        stopwatches[timerID].run();
+        Intent intent = new Intent(INTENT_TIMER_BASE + timerID);
+        scheduleTimerTask(timerID, intent);
+
         if (!executorRunning) {
             startExecutor();
         }

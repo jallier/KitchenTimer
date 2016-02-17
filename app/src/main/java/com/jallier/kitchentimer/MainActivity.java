@@ -144,8 +144,23 @@ public class MainActivity extends AppCompatActivity {
 
 
     public void svTimerStateChanged(View view) {
-        int viewID = view.getId();
-        myService.startTimer(viewID);
+        switch (view.getId()) {
+            case R.id.svTimer0:
+                myService.startTimer(0);
+                break;
+            case R.id.svTimer1:
+                myService.startTimer(1);
+                break;
+            case R.id.svTimer2:
+                myService.startTimer(2);
+                break;
+            case R.id.svTimer3:
+                myService.startTimer(3);
+                break;
+            case R.id.svTimer4:
+                myService.startTimer(4);
+                break;
+        }
     }
 
     public void resetSvTimer(View view) {
